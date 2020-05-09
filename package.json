@@ -1,0 +1,94 @@
+{
+  "name": "cause-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nodejs-server.js",
+  "scripts": {
+    "start:dev": "nodemon ./server/server.js",
+    "start:prod": "node ./server/server.js",
+    "test": "nyc mocha ./test",
+    "lint": "eslint .",
+    "lint-fix": "npm run lint -- --fix",
+    "pretest": "npm run lint",
+    "_comment": "./node_modules/mocha/bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EllisDon-Aegean/content-admin-service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EllisDon-Aegean/content-admin-service/issues"
+  },
+  "homepage": "https://github.com/EllisDon-Aegean/content-admin-service#readme",
+  "dependencies": {
+    "@google-cloud/storage": "^2.3.4",
+    "@igorivaniuk/multer-google-storage": "^1.0.2",
+    "@okta/jwt-verifier": "0.0.12",
+    "amqplib": "^0.5.3",
+    "axios": "^0.18.0",
+    "bluebird": "^3.5.5",
+    "body-parser": "^1.18.3",
+    "circular-json": "^0.5.9",
+    "cls-hooked": "^4.2.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
+    "csvtojson": "^2.0.8",
+    "current-date": "^0.1.1",
+    "datadog-metrics": "^0.8.1",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.4",
+    "express-validation": "^0.4.5",
+    "joi": "^7.3.0",
+    "js-base64": "^2.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
+    "log4js": "^3.0.6",
+    "log4js-json-layout": "^2.1.0",
+    "mongoose": "^5.7.1",
+    "multer": "^1.4.1",
+    "node-fetch": "^2.3.0",
+    "request": "^2.88.0",
+    "request-validation": "^0.1.2-0",
+    "url": "^0.11.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "eslint": "^6.4.0",
+    "eslint-config-google": "^0.14.0",
+    "mocha": "^5.2.0",
+    "nock": "^10.0.1",
+    "nodemon": "^1.18.9",
+    "nyc": "^14.1.1",
+    "sinon": "^7.5.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "google"
+    ],
+    "env": {
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "rules": {
+      "max-len": [
+        2,
+        120,
+        4,
+        {
+          "ignoreUrls": true
+        }
+      ],
+      "no-console": 0
+    }
+  },
+  "eslintIgnore": [
+    "node_modules"
+  ]
+}
