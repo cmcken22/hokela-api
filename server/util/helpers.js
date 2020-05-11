@@ -1,23 +1,42 @@
+
+const formatMultiSearchQuery = (key, value) => {
+  const values = value.split(',');
+  let result = values.map(v => {
+    return { [key]: { $eq: v } };
+  });
+  let query = { 
+    $or: result
+  };
+  return query;
+}
+
 const buildQuery = (req, mapOverride = {}) => {
   const keys = Object.keys(req.query);
 
   const validQueryMap = {
-    form_path: 'path',
     status: 'status',
     name: 'name',
-    group_id: 'group_id',
-    form_group_id: 'form_group_id',
-    project_id: 'project_id',
+    cause_id: 'cause_id',
     ...mapOverride
   };
 
   let query = {};
   for (let i = 0; i < keys.length; i++) {
     let validQuery = validQueryMap[keys[i]];
+
     if (validQuery) {
-      query = {
-        ...query,
-        [validQuery]: req.query[keys[i]]
+      let value = req.query[keys[i]];
+      if (value.indexOf(',') !== -1) {
+        value = formatMultiSearchQuery(keys[i], value);
+        query = {
+          ...query,
+          ...value
+        }
+      } else {
+        query = {
+          ...query,
+          [validQuery]: value
+        }
       }
     }
   }

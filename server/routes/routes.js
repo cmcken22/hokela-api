@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { buildQuery, buildUserInfo } = require('../util/helpers');
+const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
 
 const CauseModel = require('../models/causeModel');
@@ -28,12 +28,41 @@ const routes = function () {
     
   });
 
-  router.put('/:id', async (req, res) => {
-    
+  router.post('/', getUserInfo, async (req, res) => {
+    const createCauesReq = await CauseController.createCause(req.body, req.user);
+    if (createCauesReq.status !== 200) {
+      res.status(createCauesReq.status).send(createCauesReq.data.message);
+      return;
+    }
+    const { data } = createCauesReq;
+    res.status(createCauesReq.status).send(data);
+  });
+
+  router.patch('/:id', getUserInfo, async (req, res) => {
+    console.log('req.user', req.user);
+    const { params: { id } } = req;
+    const updateCaueReq = await CauseController.updateCause(id, req.body, req.user);
+    if (updateCaueReq.status !== 200) {
+      res.status(updateCaueReq.status).send(updateCaueReq.data.message);
+      return;
+    }
+    const { data } = updateCaueReq;
+    res.status(updateCaueReq.status).send(data);
   });
 
   router.delete('/:id', (req, res) => {
-    
+    CauseModel
+      .findByIdAndDelete(req.params.id, (err, cause) => {
+        if (err) {
+          res.status(500);
+          res.send(err);
+        } else if (cause === null) {
+          res.status(500);
+          res.send({ message: 'Caues id does not exist in mongo db' });
+        } else {
+          res.send({ message: 'Cause successfully deleted!', id: cause._id });
+        }
+      });
   });
 
   router.delete('/', (req, res) => {

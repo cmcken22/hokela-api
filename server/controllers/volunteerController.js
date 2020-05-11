@@ -1,14 +1,16 @@
-const CauseModel = require('../models/causeModel');
+const VolunteerModel = require('../models/volunteerModel');
 
-const CauseController = {
-  createCause: (data, user) => {
+const VolunteerController = {
+  createVolunteer: (id, user) => {
     return new Promise((resolve, reject) => {
-      const newCause = new CauseModel({
-        ...data,
+      const newVolunteer = new VolunteerModel({
+        cause_id: id,
+        email: user.email,
+        name: user.name,
         created_by: user,
         updated_by: user
       });
-      newCause.save((err, cause) => {
+      newVolunteer.save((err, vounteer) => {
         if (err) {
           console.log('err:', err);
           return resolve({
@@ -18,24 +20,24 @@ const CauseController = {
             }
           });
         } else {
-          console.log({ message: 'Cause successfully created!', id: cause._id });
+          console.log({ message: 'Volunteer successfully created!', id: vounteer._id });
           return resolve({
             status: 200,
-            data: cause
+            data: vounteer
           })
         }
       });
     });
   },
-  updateCause: (id, data, user) => {
+  updateVolunteer: (id, data, user) => {
     return new Promise((resolve, reject) => {
-      CauseModel.findByIdAndUpdate(id,
+      VolunteerModel.findByIdAndUpdate(id,
         {
           ...data,
           updated_by: user,
           last_modified_date: Date.now()
         },
-        (err, cause) => {
+        (err, volunteer) => {
           if (err) {
             return resolve({
               status: 500,
@@ -43,20 +45,18 @@ const CauseController = {
                 message: err
               }
             });
-          } else if (cause === null) {
+          } else if (volunteer === null) {
             return resolve({
               status: 404,
               data: {
-                message: 'Cause id does not exist in mongo db'
+                message: 'Volunteer id does not exist in mongo db'
               }
             });
           } else {
-            console.log('\nNEW CAUSE');
-            console.log('cause._doc:', cause._doc);
             return resolve({
               status: 200,
               data: {
-                ...cause._doc,
+                ...volunteer._doc,
                 ...data
               }
             });
@@ -66,4 +66,4 @@ const CauseController = {
   },
 }
 
-module.exports = CauseController;
+module.exports = VolunteerController;

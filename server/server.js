@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const config = require('../config.js');
 const PORT = process.env.PORT || config.port;
 const cors = require('cors');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const mongoose = require('mongoose');
 const USER = process.env.MONGODB_USER;
@@ -13,6 +15,7 @@ const URL = process.env.MONGODB_URL;
 const DATABASE = process.env.MONGODB_DATABASE;
 
 const routes = require('./routes/routes.js');
+const volunteerRoutes = require('./routes/volunteerRoutes.js');
 
 /* to avoid mongoose deprecation warnings */
 mongoose.set('useNewUrlParser', true);
@@ -39,6 +42,7 @@ app.use(bodyParser.urlencoded({ limit: '15mb', extended: true }));
 
 /* This mounts the routes in routes.js to the '/' route. */
 app.use('/cause-api/v1/causes', routes());
+app.use('/cause-api/v1/volunteer', volunteerRoutes());
 
 /* connect to database and listen to port only if the connection is succesful */
 const options = {

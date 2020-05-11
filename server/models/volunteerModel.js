@@ -1,18 +1,22 @@
 const mongoose = require('mongoose');
 
-const causeSchema = new mongoose.Schema({
+const volunteerSchema = new mongoose.Schema({
+  cause_id: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
   },
-  description: {
+  email: {
     type: String,
     required: true,
   },
   status: {
     type: String,
     required: true,
-    default: 'IN_REVIEW'
+    default: 'PENDING'
   },
   created_date: {
     type: Date,
@@ -44,4 +48,4 @@ const causeSchema = new mongoose.Schema({
   },
 }, { versionKey: false });
 
-module.exports = mongoose.model('Cause', causeSchema);
+module.exports = mongoose.model('Volunteer', volunteerSchema);
