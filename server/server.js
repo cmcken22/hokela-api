@@ -7,6 +7,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
 const PORT = process.env.PORT;
+const { networkInterfaces } = require('os');
 
 const mongoose = require('mongoose');
 const USER = process.env.MONGODB_USER;
@@ -69,6 +70,21 @@ mongoose.connect(uri, options)
     console.log('Database connection successful');
     app.listen(PORT, () => {
       console.log(`Listening on port ${PORT}`);
+
+      const nets = networkInterfaces();
+      const results = Object.create(null); // Or just '{}', an empty object
+      for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+          // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+          if (net.family === 'IPv4' && !net.internal) {
+            if (!results[name]) {
+              results[name] = [];
+            }
+            results[name].push(net.address);
+          }
+        }
+      }
+      console.log('results:', results);
     });
   })
   .catch((err) => {
