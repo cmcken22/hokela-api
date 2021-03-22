@@ -4,6 +4,7 @@ const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
 const { networkInterfaces } = require('os');
 const path = require('path');
+const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
 
 const CauseModel = require('../models/causeModel');
@@ -23,21 +24,24 @@ const storage = new Storage({
 
 const routes = function () {
   router.get('/test', (req, res) => {
-    const nets = networkInterfaces();
-    const results = Object.create(null); // Or just '{}', an empty object
-    for (const name of Object.keys(nets)) {
-      for (const net of nets[name]) {
-        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-        if (net.family === 'IPv4' && !net.internal) {
-          if (!results[name]) {
-            results[name] = [];
-          }
-          results[name].push(net.address);
-        }
+    const fileName = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS // or any file format
+
+    // Check if file specified by the filePath exists 
+    fs.exists(filePath, function (exists) {
+      if (exists) {
+        // Content-type is very interesting part that guarantee that
+        // Web browser will handle response in an appropriate manner.
+        res.writeHead(200, {
+          "Content-Type": "application/octet-stream",
+          "Content-Disposition": "attachment; filename=" + fileName
+        });
+        fs.createReadStream(filePath).pipe(res);
+      } else {
+        res.writeHead(400, { "Content-Type": "text/plain" });
+        res.end("ERROR File does not exist");
       }
-    }
-    console.log('results:', results);
-    res.status(200).send(results);
+    });
   });
 
   router.get('/', (req, res) => {
