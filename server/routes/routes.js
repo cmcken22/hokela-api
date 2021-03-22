@@ -24,19 +24,12 @@ const storage = new Storage({
 
 const routes = function () {
   router.get('/test', (req, res) => {
-    const fileName = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS // or any file format
+    const fileName = req.query.fileName;
+    console.log('fileName:', fileName);
+    const filePath = fileName;
+    // const fileName = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    // const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS // or any file format
 
-    console.log('\n---------------');
-    const p = path.resolve('./');
-    console.log('p:', p);
-    // console.log('TEST:', )
-    fs.readdir(p, (err, files) => {
-      files.forEach(file => {
-        console.log(file);
-      });
-    });
-    console.log('---------------\n');
 
     // Check if file specified by the filePath exists 
     fs.exists(filePath, function (exists) {

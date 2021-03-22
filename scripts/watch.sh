@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "\n--------------------------------"
 echo "------> Generating .profile.d file to generate google-credentials.json at startup"
 
 if [ -f .env ]
