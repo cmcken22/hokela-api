@@ -3,10 +3,23 @@ const router = express.Router();
 const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
 const { networkInterfaces } = require('os');
+const path = require('path');
+const { Storage } = require('@google-cloud/storage');
 
 const CauseModel = require('../models/causeModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
+// const { path } = require('../server');
+
+// const storage = Storage({
+//   keyFilename: path.resolve('../../temporal-window-307922-9f164e3c8025.json'),
+//   // projectId: process.env.FIREBASE_PROJECT_ID
+// });
+
+const storage = new Storage({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+  // keyFilename: path.resolve('temporal-window-307922-9f164e3c8025.json')
+});
 
 const routes = function () {
   router.get('/test', (req, res) => {
@@ -53,6 +66,46 @@ const routes = function () {
       .catch((err) => {
         res.send(err);
       });
+  });
+
+  router.get('/images', async (req, res) => {
+    const { query } = req;
+    const { org } = query;
+    
+    const bucket = storage.bucket('hokela-images');
+    const folder = `companies/${org && org.toLowerCase()}/images`;
+    const [files] = await bucket.getFiles({ prefix: folder });
+
+    const images = [];
+    files.forEach(async (file) => {
+      const { name } = file;
+      const [, , , fileName] = name.split('/');
+      if (!!fileName) {
+        images.push(name);
+      }
+    });
+
+    res.status(200).send(images);
+  });
+
+  router.get('/logos', async (req, res) => {
+    const { query } = req;
+    const { org } = query;
+    
+    const bucket = storage.bucket('hokela-images');
+    const folder = `companies/${org && org.toLowerCase()}/logos`;
+    const [files] = await bucket.getFiles({ prefix: folder });
+
+    const images = [];
+    files.forEach(async (file) => {
+      const { name } = file;
+      const [, , , fileName] = name.split('/');
+      if (!!fileName) {
+        images.push(name);
+      }
+    });
+
+    res.status(200).send(images);
   });
 
   router.get('/:id', (req, res) => {
