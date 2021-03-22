@@ -55,6 +55,10 @@ const options = {
   dbName: DATABASE,
 };
 
+// app.listen(PORT, () => {
+//   console.log(`Listening on port ${PORT}`);
+// });
+
 // mongoose.connect(`mongodb://${USER}:${PASSWORD}@${URL}`, options)
 mongoose.connect(`mongodb://${URL}`, options)
   .then(() => {

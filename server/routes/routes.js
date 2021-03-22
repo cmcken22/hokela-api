@@ -5,23 +5,35 @@ const { getUserInfo } = require('../middlewares/auth');
 
 const CauseModel = require('../models/causeModel');
 const CauseController = require('../controllers/causeController');
+const { hokelaCauses, allCauses } = require('../util/mockData');
 
 const routes = function () {
   router.get('/', (req, res) => {
     const query = buildQuery(req);
 
-    CauseModel
-      .find({ ...query })
-      .then((doc) => {
-        if (doc && doc.constructor === Array && doc.length === 0) {
-          res.send({ message: 'No Causes exists in the DB' });
-        } else {
-          res.send(doc);
-        }
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+    console.log('\n-----------');
+    console.log('query:', query);
+    console.log('-----------\n');
+
+    if (req.query.organization === 'Hokela Technologies') {
+      return res.send(hokelaCauses);
+    }
+    
+    return res.send(allCauses);
+
+    // CauseModel
+    //   .find({ ...query })
+    //   // .find({ organization: "Hokela Technologies" })
+    //   .then((doc) => {
+    //     if (doc && doc.constructor === Array && doc.length === 0) {
+    //       res.send({ message: 'No Causes exists in the DB' });
+    //     } else {
+    //       res.send(doc);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     res.send(err);
+    //   });
   });
 
   router.get('/:id', (req, res) => {

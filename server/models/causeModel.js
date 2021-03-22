@@ -5,14 +5,48 @@ const causeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  description: {
+  location: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  event_type: {
+    type: String,
+    // required: true,
+  },
+  date: {
+    type: String,
+    // required: true,
+  },
+  position_info: {
+    type: Object,
+    // required: true,
+  },
+  requirements: {
+    type: Object,
+    // required: true,
+  },
+  organization: {
+    type: String,
+    // required: true,
+  },
+  organization_info: {
+    type: Object
+    // required: true,
+  },
+  impact: {
+    type: Object,
+    // required: true,
+  },
+  image_link: {
+    type: String,
+  },
+  logo_link: {
+    type: String,
   },
   status: {
     type: String,
     required: true,
-    default: 'IN_REVIEW'
+    default: 'ACTIVE'
   },
   created_date: {
     type: Date,
@@ -25,21 +59,21 @@ const causeSchema = new mongoose.Schema({
   created_by: {
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   updated_by: {
     name: {
       type: String,
-      required: false,
+      // required: false,
     },
     email: {
       type: String,
-      required: false,
+      // required: false,
     },
   },
 }, { versionKey: false });

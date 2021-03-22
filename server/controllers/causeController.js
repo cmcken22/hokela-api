@@ -3,6 +3,9 @@ const CauseModel = require('../models/causeModel');
 const CauseController = {
   createCause: (data, user) => {
     return new Promise((resolve, reject) => {
+      console.log('\n===============');
+      console.log('DATA:', data);
+
       const newCause = new CauseModel({
         ...data,
         created_by: user,
