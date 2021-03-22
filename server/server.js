@@ -60,7 +60,11 @@ const options = {
 // });
 
 // mongoose.connect(`mongodb://${USER}:${PASSWORD}@${URL}`, options)
-mongoose.connect(`mongodb://${URL}`, options)
+const uri = `mongodb+srv://${USER}:${PASSWORD}@${URL}?retryWrites=true&w=majority`;
+console.log('uri:', uri);
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+mongoose.connect(uri, options)
   .then(() => {
     console.log('Database connection successful');
     app.listen(PORT, () => {
@@ -69,9 +73,9 @@ mongoose.connect(`mongodb://${URL}`, options)
   })
   .catch((err) => {
     console.error('Database connection error ' + err);
-    app.listen(PORT, () => {
-      console.log(`Listening on port ${PORT}`);
-    });
+    // app.listen(PORT, () => {
+    //   console.log(`Listening on port ${PORT}`);
+    // });
   });
 
 module.exports = app;

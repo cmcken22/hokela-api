@@ -15,25 +15,25 @@ const routes = function () {
     console.log('query:', query);
     console.log('-----------\n');
 
-    if (req.query.organization === 'Hokela Technologies') {
-      return res.send(hokelaCauses);
-    }
+    // if (req.query.organization === 'Hokela Technologies') {
+    //   return res.send(hokelaCauses);
+    // }
     
-    return res.send(allCauses);
+    // return res.send(allCauses);
 
-    // CauseModel
-    //   .find({ ...query })
-    //   // .find({ organization: "Hokela Technologies" })
-    //   .then((doc) => {
-    //     if (doc && doc.constructor === Array && doc.length === 0) {
-    //       res.send({ message: 'No Causes exists in the DB' });
-    //     } else {
-    //       res.send(doc);
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     res.send(err);
-    //   });
+    CauseModel
+      .find({ ...query })
+      // .find({ organization: "Hokela Technologies" })
+      .then((doc) => {
+        if (doc && doc.constructor === Array && doc.length === 0) {
+          res.send({ message: 'No Causes exists in the DB' });
+        } else {
+          res.send(doc);
+        }
+      })
+      .catch((err) => {
+        res.send(err);
+      });
   });
 
   router.get('/:id', (req, res) => {
