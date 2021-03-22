@@ -27,6 +27,17 @@ const routes = function () {
     const fileName = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS // or any file format
 
+    console.log('\n---------------');
+    const p = path.resolve('./');
+    console.log('p:', p);
+    // console.log('TEST:', )
+    fs.readdir(p, (err, files) => {
+      files.forEach(file => {
+        console.log(file);
+      });
+    });
+    console.log('---------------\n');
+
     // Check if file specified by the filePath exists 
     fs.exists(filePath, function (exists) {
       if (exists) {
@@ -41,6 +52,20 @@ const routes = function () {
         res.writeHead(400, { "Content-Type": "text/plain" });
         res.end("ERROR File does not exist");
       }
+    });
+  });
+
+  router.get('/test2', (req, res) => {
+    console.log('\n---------------');
+    const p = path.resolve('./');
+    console.log('p:', p);
+    fs.readdir(p, (err, files) => {
+      const allFiles = [];
+      files.forEach(file => {
+        console.log(file);
+        allFiles.push(file);
+      });
+      return res.status(200).send(allFiles);
     });
   });
 
