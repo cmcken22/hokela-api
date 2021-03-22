@@ -6,6 +6,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN apk --no-cache add curl
+RUN apk update && apk add bash && apk add --update coreutils && apk --no-cache add curl
+RUN npm run gen
+
 EXPOSE 4000
 CMD [ "npm", "run", "start:prod" ]

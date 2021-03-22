@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint-fix": "npm run lint -- --fix",
     "pretest": "npm run lint",
-    "_comment": "./node_modules/mocha/bin/mocha"
+    "_comment": "./node_modules/mocha/bin/mocha",
+    "gen": "bash scripts/watch.sh"
   },
   "repository": {
     "type": "git",
