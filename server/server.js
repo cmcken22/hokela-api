@@ -60,6 +60,23 @@ const options = {
 //   console.log(`Listening on port ${PORT}`);
 // });
 
+const logAddress = () => {
+  const nets = networkInterfaces();
+  const results = Object.create(null); // Or just '{}', an empty object
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        if (!results[name]) {
+          results[name] = [];
+        }
+        results[name].push(net.address);
+      }
+    }
+  }
+  console.log('results:', results);
+}
+
 // mongoose.connect(`mongodb://${USER}:${PASSWORD}@${URL}`, options)
 const uri = `mongodb+srv://${USER}:${PASSWORD}@${URL}?retryWrites=true&w=majority`;
 console.log('uri:', uri);
@@ -70,28 +87,15 @@ mongoose.connect(uri, options)
     console.log('Database connection successful');
     app.listen(PORT, () => {
       console.log(`Listening on port ${PORT}`);
-
-      const nets = networkInterfaces();
-      const results = Object.create(null); // Or just '{}', an empty object
-      for (const name of Object.keys(nets)) {
-        for (const net of nets[name]) {
-          // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-          if (net.family === 'IPv4' && !net.internal) {
-            if (!results[name]) {
-              results[name] = [];
-            }
-            results[name].push(net.address);
-          }
-        }
-      }
-      console.log('results:', results);
+      logAddress();
     });
   })
   .catch((err) => {
     console.error('Database connection error ' + err);
-    // app.listen(PORT, () => {
-    //   console.log(`Listening on port ${PORT}`);
-    // });
+    app.listen(PORT, () => {
+      console.log(`Listening on port ${PORT}`);
+      logAddress();
+    });
   });
 
 module.exports = app;
