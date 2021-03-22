@@ -3,10 +3,10 @@ const app = express(); // Instantiate the server.
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const config = require('../config.js');
-const PORT = process.env.PORT || config.port;
 const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
+const PORT = process.env.PORT;
 
 const mongoose = require('mongoose');
 const USER = process.env.MONGODB_USER;
@@ -69,6 +69,9 @@ mongoose.connect(`mongodb://${URL}`, options)
   })
   .catch((err) => {
     console.error('Database connection error ' + err);
+    app.listen(PORT, () => {
+      console.log(`Listening on port ${PORT}`);
+    });
   });
 
 module.exports = app;
