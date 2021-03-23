@@ -5,7 +5,7 @@
   "main": "nodejs-server.js",
   "scripts": {
     "start:dev": "nodemon ./server/server.js",
-    "start:prod": "node ./server/server.js",
+    "start:prod": "npm run gen && node ./server/server.js",
     "test": "nyc mocha ./test",
     "lint": "eslint .",
     "lint-fix": "npm run lint -- --fix",
