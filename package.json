@@ -4,7 +4,7 @@
   "description": "",
   "main": "nodejs-server.js",
   "scripts": {
-    "start:dev": "nodemon ./server/server.js",
+    "start:dev": "npm run gen & nodemon ./server/server.js",
     "start:prod": "npm run gen && node ./server/server.js",
     "test": "nyc mocha ./test",
     "lint": "eslint .",

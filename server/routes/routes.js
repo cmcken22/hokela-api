@@ -10,17 +10,39 @@ const { Storage } = require('@google-cloud/storage');
 const CauseModel = require('../models/causeModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
-// const { path } = require('../server');
 
-// const storage = Storage({
-//   keyFilename: path.resolve('../../temporal-window-307922-9f164e3c8025.json'),
-//   // projectId: process.env.FIREBASE_PROJECT_ID
+const Multer = require('multer');
+const MulterGoogleCloudStorage = require('@igorivaniuk/multer-google-storage');
+
+// var uploadHandler = Multer({
+//   storage: MulterGoogleCloudStorage.storageEngine()
 // });
 
-const storage = new Storage({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
-  // keyFilename: path.resolve('temporal-window-307922-9f164e3c8025.json')
+const uploadHandler = Multer({
+  storage: MulterGoogleCloudStorage.storageEngine({
+    limits: {
+      fileSize: 15 * 1024 * 1024, // no larger than 15mb.
+    },
+    filename: function (req, file, cb) {
+      console.log('--- GETTING FILE NAME ---');
+      const { query: { org, type, name } } = req;
+      console.log('org:', org);
+      console.log('type:', type);
+      console.log('name:', name);
+      const filename = `companies/${org && org.toLowerCase()}/${type}/${name}`;
+      console.log("Filename path - ", filename);
+      cb(null, filename);
+    },
+  }),
+  // fileFilter: function (req, file, cb) {
+  //   console.log("Checking scopes for upload access.");
+  //   if (true)
+  //     cb(null, true);
+  //   else
+  //     cb(null, false);
+  // }
 });
+
 
 const routes = function () {
   router.get('/test', (req, res) => {
@@ -93,7 +115,11 @@ const routes = function () {
   router.get('/images', async (req, res) => {
     const { query } = req;
     const { org } = query;
-    
+
+    const storage = new Storage({
+      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+    });
+
     const bucket = storage.bucket('hokela-images');
     const folder = `companies/${org && org.toLowerCase()}/images`;
     const [files] = await bucket.getFiles({ prefix: folder });
@@ -113,7 +139,11 @@ const routes = function () {
   router.get('/logos', async (req, res) => {
     const { query } = req;
     const { org } = query;
-    
+
+    const storage = new Storage({
+      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+    });
+
     const bucket = storage.bucket('hokela-images');
     const folder = `companies/${org && org.toLowerCase()}/logos`;
     const [files] = await bucket.getFiles({ prefix: folder });
@@ -128,6 +158,26 @@ const routes = function () {
     });
 
     res.status(200).send(images);
+  });
+
+  router.post('/upload-image', uploadHandler.any(), async (req, res) => {
+
+    console.log('--- UPLOADING FILE ---');
+    const { query: { org, type, name } } = req;
+    console.log('org:', org);
+    console.log('type:', type);
+    console.log('name:', name);
+
+    const storage = new Storage({
+      keyFilename: process.env.GCS_KEYFILE
+    });
+
+    const filename = `companies/${org && org.toLowerCase()}/${type}/${name}`;
+    console.log('UPLOADING FILE:', filename);
+
+    await storage.bucket(process.env.GCS_BUCKET).file(filename).makePublic();
+
+    return res.status(200).send(filename);
   });
 
   router.get('/:id', (req, res) => {

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express(); // Instantiate the server.
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const fs = require('fs');
 const config = require('../config.js');
 const cors = require('cors');
 const dotenv = require('dotenv');
