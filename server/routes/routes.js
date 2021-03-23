@@ -128,7 +128,7 @@ const routes = function () {
       keyFilename: process.env.GCS_KEYFILE
     });
 
-    const bucket = storage.bucket('hokela-images');
+    const bucket = storage.bucket(process.env.GCS_BUCKET);
     const folder = `companies/${org && org.toLowerCase()}/images`;
     const [files] = await bucket.getFiles({ prefix: folder });
 
@@ -152,7 +152,7 @@ const routes = function () {
       keyFilename: process.env.GCS_KEYFILE
     });
 
-    const bucket = storage.bucket('hokela-images');
+    const bucket = storage.bucket(process.env.GCS_BUCKET);
     const folder = `companies/${org && org.toLowerCase()}/logos`;
     const [files] = await bucket.getFiles({ prefix: folder });
 
@@ -182,6 +182,8 @@ const routes = function () {
 
     const filename = `companies/${org && org.toLowerCase()}/${type}/${name}`;
     console.log('UPLOADING FILE:', filename);
+    console.log('BUCKET:', process.env.GCS_BUCKET);
+    console.log('GCS_KEYFILE:', process.env.GCS_KEYFILE);
 
     await storage.bucket(process.env.GCS_BUCKET).file(filename).makePublic();
 
