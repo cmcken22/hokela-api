@@ -18,6 +18,7 @@ const buildQuery = (req, mapOverride = {}) => {
     name: 'name',
     cause_id: 'cause_id',
     organization: 'organization',
+    location: 'location',
     ...mapOverride
   };
 
