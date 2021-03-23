@@ -49,9 +49,6 @@ const routes = function () {
     const fileName = req.query.fileName;
     console.log('fileName:', fileName);
     const filePath = fileName;
-    // const fileName = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    // const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS // or any file format
-
 
     // Check if file specified by the filePath exists 
     fs.exists(filePath, function (exists) {
@@ -117,7 +114,7 @@ const routes = function () {
     const { org } = query;
 
     const storage = new Storage({
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+      keyFilename: process.env.GCS_KEYFILE
     });
 
     const bucket = storage.bucket('hokela-images');
@@ -141,7 +138,7 @@ const routes = function () {
     const { org } = query;
 
     const storage = new Storage({
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+      keyFilename: process.env.GCS_KEYFILE
     });
 
     const bucket = storage.bucket('hokela-images');
