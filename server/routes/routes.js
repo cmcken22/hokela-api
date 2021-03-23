@@ -168,6 +168,26 @@ const routes = function () {
     res.status(200).send(images);
   });
 
+  router.get('/info', async (req, res) => {
+    const { query: { field } } = req;
+    const fieldSet = new Set();
+
+    CauseModel
+      .find()
+      .select(field)
+      .then((docs) => {
+        for (let i = 0; i < docs.length; i++) {
+          const doc = docs[i];
+          const { [field]: temp } = doc;
+          fieldSet.add(temp);
+        }
+        return res.status(200).send(Array.from(fieldSet));
+      })
+      .catch((err) => {
+        return res.status(500).send(err);
+      });
+  });
+
   router.post('/upload-image', uploadHandler.any(), async (req, res) => {
 
     console.log('--- UPLOADING FILE ---');
