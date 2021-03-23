@@ -26,6 +26,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
 app.get('/healthz', (req, res) => {
+  console.log('/healthz');
   res.status(200).send({
     success: 'true',
     message: 'UP',
