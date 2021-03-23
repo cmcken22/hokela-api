@@ -96,17 +96,28 @@ const routes = function () {
 
     CauseModel
       .find({ ...query })
-      // .find({ organization: "Hokela Technologies" })
-      .then((doc) => {
-        if (doc && doc.constructor === Array && doc.length === 0) {
+      .sort({ 'created_date': 'desc' })
+      .exec(function (err, docs) {
+        console.log('docs:', docs);
+        if (docs && docs.constructor === Array && docs.length === 0) {
           res.send({ message: 'No Causes exists in the DB' });
         } else {
-          res.send(doc);
+          res.send(docs);
         }
-      })
-      .catch((err) => {
-        res.send(err);
+        //do stuff with images
       });
+      // .sort({ created_date: -1 })
+      // .find({ organization: "Hokela Technologies" })
+      // .then((doc) => {
+      //   if (doc && doc.constructor === Array && doc.length === 0) {
+      //     res.send({ message: 'No Causes exists in the DB' });
+      //   } else {
+      //     res.send(doc);
+      //   }
+      // })
+      // .catch((err) => {
+      //   res.send(err);
+      // });
   });
 
   router.get('/images', async (req, res) => {
