@@ -177,19 +177,34 @@ const routes = function () {
   router.get('/info', async (req, res) => {
     const { query: { field } } = req;
     const fieldSet = new Set();
-
+    
     if (field === 'locations') {
       console.log('\n=================', field);
+      const citySet = new Set();
+      const provinceSet = new Set();
+      const countrySet = new Set();
+      const addressSet = new Set();
+
       LocationModel
         .find()
         .then((docs) => {
           for (let i = 0; i < docs.length; i++) {
             const doc = docs[i];
-            const { city, province } = doc;
-            const string = `${city}${province ? `, ${province}` : ''}`;
-            fieldSet.add(string);
+            const { city, province, country } = doc;
+            if (!!city) citySet.add(city);
+            if (!!province) provinceSet.add(province);
+            if (!!country) countrySet.add(country);
+            if (!!city) {
+              const string = `${city}${province ? `, ${province}` : ''}`;
+              addressSet.add(string);
+            }
           }
-          return res.status(200).send(Array.from(fieldSet));
+          return res.status(200).send({
+            cities: Array.from(citySet),
+            provinces: Array.from(provinceSet),
+            countries: Array.from(countrySet),
+            addresses: Array.from(addressSet),
+          });
         })
         .catch((err) => {
           return res.status(500).send(err);
