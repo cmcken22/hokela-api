@@ -8,6 +8,7 @@ const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
 
 const CauseModel = require('../models/causeModel');
+const LocationModel = require('../models/locationModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
 
@@ -82,42 +83,47 @@ const routes = function () {
   });
 
   router.get('/', (req, res) => {
-    const query = buildQuery(req);
+    const { locations, ...rest } = req.query; 
+    const query = buildQuery(rest);
 
     console.log('\n-----------');
     console.log('query:', query);
     console.log('-----------\n');
 
-    // if (req.query.organization === 'Hokela Technologies') {
-    //   return res.send(hokelaCauses);
-    // }
-    
-    // return res.send(allCauses);
-
     CauseModel
       .find({ ...query })
       .sort({ 'created_date': 'desc' })
-      .exec(function (err, docs) {
-        console.log('docs:', docs);
+      .exec(async (err, docs) => {
         if (docs && docs.constructor === Array && docs.length === 0) {
           res.send({ message: 'No Causes exists in the DB' });
         } else {
-          res.send(docs);
+          const result = [];
+          for (let i = 0; i < docs.length; i++) {
+            let doc = docs[i];
+            let locationQuery = {
+              cause_id: doc._id,
+            };
+            if (locations) {
+              locationQuery = {
+                ...locationQuery,
+                locations
+              }
+            }
+
+            locationQuery = buildQuery(locationQuery);
+            let locs = await LocationModel.find({ ...locationQuery });
+            if (locs && locs.length) {
+              doc = {
+                ...doc._doc,
+                locations: locs
+              };
+              result.push(doc);
+            }
+          }
+
+          res.send(result);
         }
-        //do stuff with images
       });
-      // .sort({ created_date: -1 })
-      // .find({ organization: "Hokela Technologies" })
-      // .then((doc) => {
-      //   if (doc && doc.constructor === Array && doc.length === 0) {
-      //     res.send({ message: 'No Causes exists in the DB' });
-      //   } else {
-      //     res.send(doc);
-      //   }
-      // })
-      // .catch((err) => {
-      //   res.send(err);
-      // });
   });
 
   router.get('/images', async (req, res) => {
@@ -172,20 +178,39 @@ const routes = function () {
     const { query: { field } } = req;
     const fieldSet = new Set();
 
-    CauseModel
-      .find()
-      .select(field)
-      .then((docs) => {
-        for (let i = 0; i < docs.length; i++) {
-          const doc = docs[i];
-          const { [field]: temp } = doc;
-          fieldSet.add(temp);
-        }
-        return res.status(200).send(Array.from(fieldSet));
-      })
-      .catch((err) => {
-        return res.status(500).send(err);
-      });
+    if (field === 'locations') {
+      console.log('\n=================', field);
+      LocationModel
+        .find()
+        .then((docs) => {
+          for (let i = 0; i < docs.length; i++) {
+            const doc = docs[i];
+            const { city, province } = doc;
+            const string = `${city}${province ? `, ${province}` : ''}`;
+            fieldSet.add(string);
+          }
+          return res.status(200).send(Array.from(fieldSet));
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    } else {
+      CauseModel
+        .find()
+        .select(field)
+        .then((docs) => {
+          for (let i = 0; i < docs.length; i++) {
+            const doc = docs[i];
+            const { [field]: temp } = doc;
+            fieldSet.add(temp);
+          }
+          return res.status(200).send(Array.from(fieldSet));
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    }
+
   });
 
   router.post('/upload-image', uploadHandler.any(), async (req, res) => {

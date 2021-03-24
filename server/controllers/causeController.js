@@ -1,4 +1,5 @@
 const CauseModel = require('../models/causeModel');
+const LocationModel = require('../models/locationModel');
 
 const CauseController = {
   createCause: (data, user) => {
@@ -11,9 +12,10 @@ const CauseController = {
         created_by: user,
         updated_by: user
       });
-      newCause.save((err, cause) => {
+      newCause.save(async (err, cause) => {
         if (err) {
           console.log('err:', err);
+
           return resolve({
             status: 400,
             data: {
@@ -22,6 +24,22 @@ const CauseController = {
           });
         } else {
           console.log({ message: 'Cause successfully created!', id: cause._id });
+
+          const { locations } = data;
+          console.log('locations:', locations);
+          for (let i = 0; i < locations.length; i++) {
+            const location = locations[i];
+            console.log('location:', location);
+            const newLocation = new LocationModel({
+              ...location,
+              cause_id: newCause._id,
+              created_by: user,
+              updated_by: user
+            });
+            const result = await newLocation.save();
+            console.log('result:', result);
+          }
+
           return resolve({
             status: 200,
             data: cause

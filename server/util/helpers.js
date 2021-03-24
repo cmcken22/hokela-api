@@ -10,39 +10,65 @@ const formatMultiSearchQuery = (key, value) => {
   return query;
 }
 
-const buildQuery = (req, mapOverride = {}) => {
-  const keys = Object.keys(req.query);
+const buildQuery = (query, mapOverride = {}) => {
+  const keys = Object.keys(query);
+
+  console.log('\n-------------');
 
   const validQueryMap = {
     status: 'status',
     name: 'name',
     cause_id: 'cause_id',
     organization: 'organization',
-    location: 'location',
+    locations: 'locations',
     ...mapOverride
   };
 
-  let query = {};
+  let queryRes = {};
   for (let i = 0; i < keys.length; i++) {
     let validQuery = validQueryMap[keys[i]];
 
     if (validQuery) {
-      let value = req.query[keys[i]];
-      if (value.indexOf(',') !== -1) {
+      let value = query[keys[i]];
+      if (typeof value === 'string' && value.indexOf('[') !== -1) {
+        const array = JSON.parse(value);
+        let val = { $or: [] };
+        for (let i = 0; i < array.length; i++) {
+          const loc = array[i];
+          const [city, province] = loc.split(',');
+          let obj = {
+            city
+          };
+          if (!!province) {
+            obj = {
+              ...obj,
+              $and: [{
+                province
+              }]
+            }
+          }
+          val.$or.push(obj);
+        }
+
+        queryRes = {
+          ...queryRes,
+          ...val,
+        };
+      } else if (typeof value === 'string' && value.indexOf(',') !== -1) {
         value = formatMultiSearchQuery(keys[i], value);
-        query = {
-          ...query,
+        queryRes = {
+          ...queryRes,
           ...value
-        }
+        };
       } else {
-        query = {
-          ...query,
+        queryRes = {
+          ...queryRes,
           [validQuery]: value
-        }
+        };
       }
     }
   }
-  return query;
+  return queryRes;
 }
 
 const buildUserInfo = (res) => {

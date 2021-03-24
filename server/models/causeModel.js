@@ -5,10 +5,10 @@ const causeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  location: {
-    type: String,
-    // required: true,
-  },
+  // locations: {
+  //   type: Array,
+  //   required: true,
+  // },
   event_type: {
     type: String,
     // required: true,
