@@ -247,7 +247,7 @@ const routes = function () {
 
     await storage.bucket(process.env.GCS_BUCKET).file(filename).makePublic();
 
-    return res.status(200).send(filename);
+    return res.status(200).send(`https://storage.googleapis.com/${process.env.GCS_BUCKET}/${filename}`);
   });
 
   router.get('/:id', (req, res) => {
