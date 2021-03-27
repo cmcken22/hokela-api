@@ -74,6 +74,33 @@ const CauseController = {
           } else {
             console.log('\nNEW CAUSE');
             console.log('cause._doc:', cause._doc);
+
+            const { locations } = data;
+            console.log('locations:', locations);
+            for (let i = 0; i < locations.length; i++) {
+              const location = locations[i];
+              const { _id: locationId } = location;
+              console.log('location:', location);
+              if (!locationId) {
+                const newLocation = new LocationModel({
+                  ...location,
+                  cause_id: data._id,
+                  created_by: user,
+                  updated_by: user
+                });
+                console.log('newLocation:', newLocation);
+                newLocation.save(async (err, loc) => {});
+              } else {
+                LocationModel.findByIdAndUpdate(locationId,
+                  {
+                    ...location,
+                    updated_by: user,
+                    last_modified_date: Date.now()
+                  },
+                  (err, loc) => {});
+              }
+            }
+
             return resolve({
               status: 200,
               data: {

@@ -251,7 +251,23 @@ const routes = function () {
   });
 
   router.get('/:id', (req, res) => {
-    
+    const { params: { id } } = req;
+    CauseModel
+      .findById(id, async (err, doc) => {
+        if (err) {
+          return res.status(500).send({ err: `Error finding Cause with id: ${id}` })
+        }
+
+        const locs = await LocationModel.find({ cause_id: id });
+        if (locs && locs.length) {
+          doc = {
+            ...doc._doc,
+            locations: locs
+          };
+        }
+
+        return res.status(200).send(doc);
+      });
   });
 
   router.post('/', getUserInfo, async (req, res) => {
