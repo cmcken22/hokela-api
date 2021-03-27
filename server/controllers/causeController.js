@@ -1,4 +1,5 @@
 const CauseModel = require('../models/causeModel');
+const locationModel = require('../models/locationModel');
 const LocationModel = require('../models/locationModel');
 
 const CauseController = {
@@ -27,6 +28,7 @@ const CauseController = {
 
           const { locations } = data;
           console.log('locations:', locations);
+
           for (let i = 0; i < locations.length; i++) {
             const location = locations[i];
             console.log('location:', location);
@@ -56,7 +58,7 @@ const CauseController = {
           updated_by: user,
           last_modified_date: Date.now()
         },
-        (err, cause) => {
+        async (err, cause) => {
           if (err) {
             return resolve({
               status: 500,
@@ -76,7 +78,25 @@ const CauseController = {
             console.log('cause._doc:', cause._doc);
 
             const { locations } = data;
+            console.log('\n---------------------');
             console.log('locations:', locations);
+
+            const currentLocations = await LocationModel.find({ cause_id: cause._doc._id });
+            console.log('currentLocations:', currentLocations);
+
+            if (currentLocations && currentLocations.length) {
+              for (let i = 0; i < currentLocations.length; i++) {
+                const location = currentLocations[i];
+                const { _id: locationId } = location;
+                const currentLoc = locations && locations.find(loc => loc._id == locationId);
+                if (!currentLoc) {
+                  LocationModel.findByIdAndDelete(locationId, (err, result) => {
+                    console.log('err:', err);
+                  });
+                }
+              }
+            }
+
             for (let i = 0; i < locations.length; i++) {
               const location = locations[i];
               const { _id: locationId } = location;
