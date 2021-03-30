@@ -71,16 +71,20 @@ const routes = function () {
           subject: 'Thank you!',
           text: 'TEST!!!',
           html: `
-            <p>
-              Thank you for applying to <strong>${name}</strong>!
+            <div style="width:100%">
+              <p>
+                Thank you for applying to <strong>${name}</strong>!
+              </p>
               <br></br>
-              ---
               <img
                 src="https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_icon.png"
                 style="height:60px;width:60px"
               ></img>
-              For any questions please contact <strong>mathieu.mackay@hokela.ca</strong>
-            </p>
+              <br></br>
+              <p>
+                For any questions please contact <strong>mathieu.mackay@hokela.ca</strong>
+              </p>
+            </div>
           `,
         }
 
