@@ -26,7 +26,7 @@ const locationSchema = new mongoose.Schema({
   created_by: {
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
