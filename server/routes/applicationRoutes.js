@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
+const nodemailer = require('nodemailer');
+
 
 const ApplicationModel = require('../models/applicationModel');
+const CauseModel = require('../models/causeModel');
 // const VolunteerController = require('../controllers/volunteerController');
 
 const routes = function () {
@@ -43,6 +46,13 @@ const routes = function () {
       user
     } = req;
 
+    const cause = await CauseModel.findById({ _id: cause_id });
+    console.log('cause:', cause);
+    if (!cause) res.send(404).send('Cause not found!');
+
+    const { name } = cause;
+    console.log('name:', name);
+
     const newApplication = new ApplicationModel({
       cause_id,
       location_id,
@@ -54,6 +64,31 @@ const routes = function () {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
+
+        const transport = nodemailer.createTransport({
+          host: "smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: process.env.MAIL_TRAP_USER,
+            pass: process.env.MAIL_TRAP_PASS
+          }
+        });
+        
+        const mailOptions = {
+          from: email,
+          to: 'conner.mckenna94@gmail.com',
+          subject: 'Sending Email using Node.js',
+          text: `${email} has applied to "${name}"!`
+        };
+        
+        transport.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+
         console.log('\n=======================');
         console.log('location_id:', location_id);
         console.log('cause_id:', cause_id);
