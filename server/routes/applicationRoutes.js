@@ -3,7 +3,8 @@ const router = express.Router();
 const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
 const nodemailer = require('nodemailer');
-
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const ApplicationModel = require('../models/applicationModel');
 const CauseModel = require('../models/causeModel');
@@ -50,7 +51,7 @@ const routes = function () {
     console.log('cause:', cause);
     if (!cause) res.send(404).send('Cause not found!');
 
-    const { name } = cause;
+    const { name, created_by } = cause;
     console.log('name:', name);
 
     const newApplication = new ApplicationModel({
@@ -64,41 +65,48 @@ const routes = function () {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
+        const msg = {
+          to: email, // Change to your recipient
+          from: 'conner.mckenna@hokela.ca', // Change to your verified sender
+          subject: 'Thank you!',
+          text: 'TEST!!!',
+          html: `<p>Thank you for applying to <strong>${name}</strong>!</p>`,
+        }
+        sgMail.send(msg).then(() => {
+          console.log('EMAIL SENT1:', email);
+        })
+        .catch(err => {
+          console.log('EMAIL ERR1:', email);
+        })
 
-        const transport = nodemailer.createTransport({
-          host: "smtp.mailtrap.io",
-          port: 2525,
-          auth: {
-            user: process.env.MAIL_TRAP_USER,
-            pass: process.env.MAIL_TRAP_PASS
-          }
-        });
-        
-        const mailOptions = {
-          from: email,
-          to: 'conner.mckenna94@gmail.com',
-          subject: 'Sending Email using Node.js',
-          text: `${email} has applied to "${name}"!`
-        };
-        
-        transport.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
+        let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
+        if (created_by && created_by.email) {
+          users.push(created_by.email)
+        }
 
-        console.log('\n=======================');
-        console.log('location_id:', location_id);
-        console.log('cause_id:', cause_id);
-        console.log('email:', email);
-        console.log('application:', application);
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+          console.log('user:', user);
+          console.log('sending follow up email to:', user);
+          const msg1 = {
+            to: user, // Change to your recipient
+            from: 'conner.mckenna@hokela.ca', // Change to your verified sender
+            subject: 'Hokela Info!',
+            text: 'TEST!!!',
+            html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
+          }
+          sgMail.send(msg1)
+            .then(() => {
+              console.log(`EMAIL SENT${i}:`, user);
+            })
+            .catch(err => {
+              console.log(`EMAIL ERR${i}:`, user);
+            })
+        }
 
         return res.status(200).send(application);
       }
     });
-
   });
 
   router.patch('/:id', getUserInfo, async (req, res) => {

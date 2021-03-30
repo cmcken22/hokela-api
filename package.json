@@ -27,6 +27,7 @@
     "@google-cloud/storage": "^2.3.4",
     "@igorivaniuk/multer-google-storage": "^1.0.2",
     "@okta/jwt-verifier": "0.0.12",
+    "@sendgrid/mail": "^7.4.2",
     "amqplib": "^0.5.3",
     "axios": "^0.18.0",
     "bluebird": "^3.5.5",
