@@ -73,9 +73,15 @@ const routes = function () {
           html: `
             <p>
               Thank you for applying to <strong>${name}</strong>!
-              <br />
+              <br></br>
+              ---
+              <img
+                src="https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_icon.png"
+                style="height:60px;width:60px"
+              ></img>
               For any questions please contact <strong>mathieu.mackay@hokela.ca</strong>
-            </p>`,
+            </p>
+          `,
         }
 
         console.log('\n==============');
@@ -101,9 +107,10 @@ const routes = function () {
             html: `
               <p>
                 User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!
-                <br />
-                Cause Owner: ${created_by.email}
-              </p>`,
+                <br></br>
+                Cause Owner: <strong>${created_by.email}</strong>
+              </p>
+            `,
           }
           sgMail.send(followUpEmail)
             .then(() => {
