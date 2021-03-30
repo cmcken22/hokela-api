@@ -72,11 +72,18 @@ const routes = function () {
           text: 'TEST!!!',
           html: `<p>Thank you for applying to <strong>${name}</strong>!</p>`,
         }
+
+        console.log('\n==============');
+        console.log('SENDING THANK YOU EMAIL TO:', email);
+        console.log('msg:', msg);
+        console.log('==============\n');
+
         sgMail.send(msg).then(() => {
-          console.log('EMAIL SENT1:', email);
+          console.log('THANK YOU EMAIL SENT:', email);
         })
         .catch(err => {
-          console.log('EMAIL ERR1:', email);
+          console.log('THANK YOU EMAIL ERR:', email);
+          console.log('err:', err);
         })
 
         let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
