@@ -80,7 +80,7 @@ const routes = function () {
 
         console.log('\n==============');
         console.log('SENDING THANK YOU EMAIL TO:', email);
-        console.log('msg:', msg);
+        console.log('msg:', thankYouMsg);
         console.log('==============\n');
 
         sgMail.send(thankYouMsg).then(() => {
