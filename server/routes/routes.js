@@ -100,6 +100,7 @@ const routes = function () {
           const result = [];
           for (let i = 0; i < docs.length; i++) {
             let doc = docs[i];
+            console.log('doc:', doc.name);
             let locationQuery = {
               cause_id: doc._id,
             };
@@ -172,6 +173,29 @@ const routes = function () {
     });
 
     res.status(200).send(images);
+  });
+
+  router.get('/contact', async (req, res) => {
+    const { query } = req;
+
+    CauseModel
+      .find({ ...query })
+      .sort({ 'created_date': 'desc' })
+      .exec(async (err, docs) => {
+        if (err) {
+          res.status(500).send(err);
+        }
+        if (!docs || !docs.length) {
+          res.status(404).send([]);
+        }
+        let result = [];
+        for (let i = 0; i < docs.length; i++) {
+          const doc = docs[i];
+          const { contact } = doc;
+          result.push(contact);
+        }
+        res.status(200).send(result);
+      });
   });
 
   router.get('/info', async (req, res) => {
