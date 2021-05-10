@@ -47,6 +47,10 @@ const causeSchema = new mongoose.Schema({
   logo_link: {
     type: String,
   },
+  contact: {
+    type: Object,
+    // required: true,
+  },
   status: {
     type: String,
     required: true,
