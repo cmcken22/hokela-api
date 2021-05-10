@@ -37,6 +37,10 @@ const causeSchema = new mongoose.Schema({
     type: Object,
     // required: true,
   },
+  sections: {
+    type: Array,
+    // required: true,
+  },
   image_link: {
     type: String,
   },
