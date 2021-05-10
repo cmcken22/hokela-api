@@ -241,7 +241,9 @@ const routes = function () {
           for (let i = 0; i < docs.length; i++) {
             const doc = docs[i];
             const { [field]: temp } = doc;
-            fieldSet.add(temp);
+            if (!!temp) {
+              fieldSet.add(temp);
+            }
           }
           return res.status(200).send(Array.from(fieldSet));
         })
