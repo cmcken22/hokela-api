@@ -17,25 +17,40 @@ const causeSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-  position_info: {
-    type: Object,
-    // required: true,
-  },
-  requirements: {
-    type: Object,
-    // required: true,
-  },
+  // position_info: {
+  //   type: Object,
+  //   // required: true,
+  // },
+  // requirements: {
+  //   type: Object,
+  //   // required: true,
+  // },
   organization: {
     type: String,
     // required: true,
   },
-  organization_info: {
-    type: Object
-    // required: true,
+  // organization_info: {
+  //   type: Object
+  //   // required: true,
+  // },
+  // impact: {
+  //   type: Object,
+  //   // required: true,
+  // },
+  sector: {
+    type: String
   },
-  impact: {
-    type: Object,
-    // required: true,
+  days: {
+    type: String
+  },
+  hours: {
+    type: String
+  },
+  duration: {
+    type: String
+  },
+  ages: {
+    type: String
   },
   sections: {
     type: Array,
