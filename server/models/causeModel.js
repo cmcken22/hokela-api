@@ -5,40 +5,14 @@ const causeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // locations: {
-  //   type: Array,
-  //   required: true,
-  // },
-  event_type: {
-    type: String,
-    // required: true,
-  },
-  date: {
-    type: String,
-    // required: true,
-  },
-  // position_info: {
-  //   type: Object,
-  //   // required: true,
-  // },
-  // requirements: {
-  //   type: Object,
-  //   // required: true,
-  // },
   organization: {
     type: String,
-    // required: true,
   },
-  // organization_info: {
-  //   type: Object
-  //   // required: true,
-  // },
-  // impact: {
-  //   type: Object,
-  //   // required: true,
-  // },
   sector: {
     type: String
+  },
+  area: {
+    type: String,
   },
   time_of_day: {
     type: String
@@ -55,9 +29,17 @@ const causeSchema = new mongoose.Schema({
   ages: {
     type: String
   },
+  skill: {
+    type: String
+  },
+  other_skills: {
+    type: Array
+  },
+  ideal_for: {
+    type: Array
+  },
   sections: {
     type: Array,
-    // required: true,
   },
   image_link: {
     type: String,
@@ -67,7 +49,6 @@ const causeSchema = new mongoose.Schema({
   },
   contact: {
     type: Object,
-    // required: true,
   },
   status: {
     type: String,
@@ -85,7 +66,6 @@ const causeSchema = new mongoose.Schema({
   created_by: {
     name: {
       type: String,
-      // required: true,
     },
     email: {
       type: String,
@@ -95,11 +75,9 @@ const causeSchema = new mongoose.Schema({
   updated_by: {
     name: {
       type: String,
-      // required: false,
     },
     email: {
       type: String,
-      // required: false,
     },
   },
 }, { versionKey: false });

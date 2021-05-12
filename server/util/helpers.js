@@ -21,6 +21,13 @@ const buildQuery = (query, mapOverride = {}) => {
     cause_id: 'cause_id',
     organization: 'organization',
     locations: 'locations',
+    sector: 'sector',
+    time_of_day: 'time_of_day',
+    duration: 'duration',
+    skill: 'skill',
+    ages: 'ages',
+    days: 'days',
+    ideal_for: 'ideal_for',
     ...mapOverride
   };
 

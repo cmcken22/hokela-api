@@ -86,9 +86,9 @@ const routes = function () {
     const { locations, ...rest } = req.query; 
     const query = buildQuery(rest);
 
-    // console.log('\n-----------');
-    // console.log('query:', query);
-    // console.log('-----------\n');
+    console.log('\n-----------');
+    console.log('query:', query && query.$or);
+    console.log('-----------\n');
 
     CauseModel
       .find({ ...query })
