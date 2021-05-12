@@ -13,7 +13,7 @@ const formatMultiSearchQuery = (key, value) => {
 const buildQuery = (query, mapOverride = {}) => {
   const keys = Object.keys(query);
 
-  console.log('\n-------------');
+  // console.log('\n-------------');
 
   const validQueryMap = {
     status: 'status',

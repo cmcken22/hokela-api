@@ -40,8 +40,11 @@ const causeSchema = new mongoose.Schema({
   sector: {
     type: String
   },
-  days: {
+  time_of_day: {
     type: String
+  },
+  days: {
+    type: Array
   },
   hours: {
     type: String

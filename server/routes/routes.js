@@ -69,9 +69,9 @@ const routes = function () {
   });
 
   router.get('/test2', (req, res) => {
-    console.log('\n---------------');
+    // console.log('\n---------------');
     const p = path.resolve('./');
-    console.log('p:', p);
+    // console.log('p:', p);
     fs.readdir(p, (err, files) => {
       const allFiles = [];
       files.forEach(file => {
@@ -86,9 +86,9 @@ const routes = function () {
     const { locations, ...rest } = req.query; 
     const query = buildQuery(rest);
 
-    console.log('\n-----------');
-    console.log('query:', query);
-    console.log('-----------\n');
+    // console.log('\n-----------');
+    // console.log('query:', query);
+    // console.log('-----------\n');
 
     CauseModel
       .find({ ...query })
@@ -100,7 +100,6 @@ const routes = function () {
           const result = [];
           for (let i = 0; i < docs.length; i++) {
             let doc = docs[i];
-            console.log('doc:', doc.name);
             let locationQuery = {
               cause_id: doc._id,
             };
@@ -251,7 +250,46 @@ const routes = function () {
           return res.status(500).send(err);
         });
     }
+  });
 
+  router.get('/type-ahead-options', async (req, res) => {
+    const citySet = new Set();
+    const provinceSet = new Set();
+    const countrySet = new Set();
+    const addressSet = new Set();
+    const organizationSet = new Set();
+
+    const locations = await LocationModel.find();
+    if (locations && locations.length) {
+      for (let i = 0; i < locations.length; i++) {
+        const doc = locations[i];
+        const { city, province, country } = doc;
+        if (!!city) citySet.add(city);
+        if (!!province) provinceSet.add(province);
+        if (!!country) countrySet.add(country);
+        if (!!city) {
+          const string = `${city}${province ? `, ${province}` : ''}`;
+          addressSet.add(string);
+        }
+      }
+    }
+
+    const causes = await CauseModel.find();
+    if (causes && causes.length) {
+      for (let i = 0; i < causes.length; i++) {
+        const doc = causes[i];
+        const { organization } = doc;
+        if (!!organization) organizationSet.add(organization);
+      }
+    }
+
+    return res.status(200).send({
+      cities: Array.from(citySet),
+      provinces: Array.from(provinceSet),
+      countries: Array.from(countrySet),
+      addresses: Array.from(addressSet),
+      organizations: Array.from(organizationSet)
+    });
   });
 
   router.post('/upload-image', uploadHandler.any(), async (req, res) => {
