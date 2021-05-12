@@ -6,7 +6,9 @@ const { networkInterfaces } = require('os');
 const path = require('path');
 const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
+const Base64 = require('js-base64').Base64;
 
+const mongoose = require('mongoose');
 const CauseModel = require('../models/causeModel');
 const LocationModel = require('../models/locationModel');
 const CauseController = require('../controllers/causeController');
@@ -83,47 +85,155 @@ const routes = function () {
   });
 
   router.get('/', (req, res) => {
-    const { locations, ...rest } = req.query; 
+    const {
+      page_token: pageToken,
+      page_size: pageSize,
+      locations,
+      ...rest
+    } = req.query; 
     const query = buildQuery(rest);
 
     console.log('\n-----------');
     console.log('query:', query && query.$or);
     console.log('-----------\n');
 
-    CauseModel
-      .find({ ...query })
-      .sort({ 'created_date': 'desc' })
-      .exec(async (err, docs) => {
-        if (docs && docs.constructor === Array && docs.length === 0) {
-          res.send({ message: 'No Causes exists in the DB' });
-        } else {
-          const result = [];
-          for (let i = 0; i < docs.length; i++) {
-            let doc = docs[i];
-            let locationQuery = {
-              cause_id: doc._id,
-            };
-            if (locations) {
-              locationQuery = {
-                ...locationQuery,
-                locations
-              }
-            }
-
-            locationQuery = buildQuery(locationQuery);
-            let locs = await LocationModel.find({ ...locationQuery });
-            if (locs && locs.length) {
-              doc = {
-                ...doc._doc,
-                locations: locs
-              };
-              result.push(doc);
-            }
-          }
-
-          res.send(result);
+    let facet = {};
+    if (!pageSize) {
+      facet = {
+        metadata: [
+          { $count: "total" },
+          { $addFields: { page: 0 } }
+        ],
+        data: [
+          { $skip: 0 },
+          { $limit: 10000000 },
+          { $sort: { created_date: 1 } }
+        ]
+      };
+    } else if (!!pageSize && !pageToken) {
+      facet = {
+        metadata: [
+          { $count: "total" },
+          { $addFields: { page: 0 } }
+        ],
+        data: [
+          { $skip: 0 },
+          { $limit: JSON.parse(pageSize) },
+          { $sort: { created_date: 1 } }
+        ]
+      };
+    } else if (!!pageSize && !!pageToken) {
+      const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
+      if (!!pageSize && !!decodedPageToken) {
+        if (decodedPageToken.page_size !== pageSize) {
+          return res.status(400).send('Page size does not match!');
         }
-      });
+      }
+      facet = {
+        metadata: [
+          { $count: "total" },
+          { $addFields: { page: decodedPageToken.page_offset } }
+        ],
+        data: [
+          { $skip: pageSize * decodedPageToken.page_offset },
+          { $limit: JSON.parse(pageSize) },
+          { $sort: { created_date: 1 } }
+        ]
+      };
+    }
+
+
+    console.log('facet:', facet);
+
+    // TODO: build this array if other queries come in
+    const causeFilters = [
+      { $expr: { $eq: ["$status", "ACTIVE"] } },
+    ];
+
+    let fieldsToProject = {};
+    for (let key in CauseModel.schema.paths) {
+      if (key !== '_id') {
+        fieldsToProject = {
+          ...fieldsToProject,
+          [key]: `$${key}`
+        }
+      }
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          $and: [...causeFilters]
+        }
+      },
+      {
+        $project: {
+          _id: {
+            $toString: "$_id"
+          },
+          ...fieldsToProject
+        }
+      },
+      {
+        "$lookup": {
+          from: "locations",
+          localField: "_id",
+          foreignField: "cause_id",
+          as: "locations"
+        }
+      },
+    ];
+
+    pipeline.push({
+      $facet: {
+        ...facet
+      }
+    });
+
+    CauseModel.aggregate([...pipeline], (err, data) => {
+      console.log('\n\n--------------------');
+      if (err) {
+        console.log('ERROR:', err);
+        return res.send('ERROR:', err);
+      }
+
+      return res.send(data);
+    });
+
+    // CauseModel
+    //   .find({ ...query })
+    //   .sort({ 'created_date': 'desc' })
+    //   .exec(async (err, docs) => {
+    //     if (docs && docs.constructor === Array && docs.length === 0) {
+    //       res.send({ message: 'No Causes exists in the DB' });
+    //     } else {
+    //       const result = [];
+    //       for (let i = 0; i < docs.length; i++) {
+    //         let doc = docs[i];
+    //         let locationQuery = {
+    //           cause_id: doc._id,
+    //         };
+    //         if (locations) {
+    //           locationQuery = {
+    //             ...locationQuery,
+    //             locations
+    //           }
+    //         }
+
+    //         locationQuery = buildQuery(locationQuery);
+    //         let locs = await LocationModel.find({ ...locationQuery });
+    //         if (locs && locs.length) {
+    //           doc = {
+    //             ...doc._doc,
+    //             locations: locs
+    //           };
+    //           result.push(doc);
+    //         }
+    //       }
+
+    //       res.send(result);
+    //     }
+    //   });
   });
 
   router.get('/images', async (req, res) => {
