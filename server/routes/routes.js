@@ -142,9 +142,6 @@ const routes = function () {
       };
     }
 
-
-    console.log('facet:', facet);
-
     // TODO: build this array if other queries come in
     const causeFilters = [
       { $expr: { $eq: ["$status", "ACTIVE"] } },
@@ -175,14 +172,44 @@ const routes = function () {
         }
       },
       {
-        "$lookup": {
+        $lookup: {
           from: "locations",
           localField: "_id",
           foreignField: "cause_id",
           as: "locations"
         }
-      },
+      }
     ];
+
+
+    if (!!locations) {
+      const parsedLocations = JSON.parse(locations);
+      let locationQueries = [];
+      for (let i = 0; i < parsedLocations.length; i++) {
+        const location = parsedLocations[i];
+        const [city, province] = location.split(',');
+        if (city === 'Remote') {
+          locationQueries.push({
+            $and: [
+              { 'locations.city': { $exists: true, $in: [city] } },
+            ]
+          });
+        } else {
+          locationQueries.push({
+            $and: [
+              { 'locations.city': { $exists: true, $in: [city] } },
+              { 'locations.province': { $exists: true, $in: [province] } }
+            ]
+          });
+        }
+      }
+
+      pipeline.push({
+        "$match": {
+          $or: [...locationQueries]
+        }
+      });
+    }
 
     pipeline.push({
       $facet: {
@@ -197,7 +224,7 @@ const routes = function () {
         return res.send('ERROR:', err);
       }
 
-      return res.send(data);
+      return res.status(200).send(data);
     });
 
     // CauseModel
