@@ -84,147 +84,288 @@ const routes = function () {
     });
   });
 
-  router.get('/', (req, res) => {
+  router.get('/', async (req, res) => {
     const {
       page_token: pageToken,
       page_size: pageSize,
       locations,
+      sector,
+      time_of_day,
+      duration,
+      organization,
+      ages,
+      days,
+      ideal_for,
       ...rest
     } = req.query; 
     const query = buildQuery(rest);
 
     console.log('\n-----------');
-    console.log('query:', query && query.$or);
+    console.log('pageSize:', pageSize);
+    console.log('pageToken:', pageToken);
     console.log('-----------\n');
 
-    let facet = {};
-    if (!pageSize) {
-      facet = {
-        metadata: [
-          { $count: "total" },
-          { $addFields: { page: 0 } }
-        ],
-        data: [
-          { $skip: 0 },
-          { $limit: 10000000 },
-          { $sort: { created_date: 1 } }
-        ]
-      };
-    } else if (!!pageSize && !pageToken) {
-      facet = {
-        metadata: [
-          { $count: "total" },
-          { $addFields: { page: 0 } }
-        ],
-        data: [
-          { $skip: 0 },
-          { $limit: JSON.parse(pageSize) },
-          { $sort: { created_date: 1 } }
-        ]
-      };
-    } else if (!!pageSize && !!pageToken) {
-      const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
-      if (!!pageSize && !!decodedPageToken) {
-        if (decodedPageToken.page_size !== pageSize) {
-          return res.status(400).send('Page size does not match!');
+    const aggregateCausesWithLocations = (pageToken, pageSize, locations) => {
+      return new Promise(async (resolve) => {
+        let facet = {};
+        if (!pageSize) {
+          console.log('1');
+          facet = {
+            metadata: [
+              { $count: "total" },
+              { $addFields: { page: 0 } }
+            ],
+            data: [
+              { $skip: 0 },
+              { $limit: 10000000 },
+              { $sort: { created_date: 1 } }
+            ]
+          };
+        } else if (!!pageSize && !pageToken) {
+          console.log('2');
+          facet = {
+            metadata: [
+              { $count: "total" },
+              { $addFields: { page: 0 } }
+            ],
+            data: [
+              { $skip: 0 },
+              { $limit: JSON.parse(pageSize) },
+              { $sort: { created_date: 1 } }
+            ]
+          };
+        } else if (!!pageSize && !!pageToken) {
+          console.log('3');
+          const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
+          if (!!pageSize && !!decodedPageToken) {
+            if (decodedPageToken.page_size !== pageSize) {
+              return res.status(400).send('Page size does not match!');
+            }
+          }
+          facet = {
+            metadata: [
+              { $count: "total" },
+              { $addFields: { page: decodedPageToken.page_offset } }
+            ],
+            data: [
+              { $skip: pageSize * decodedPageToken.page_offset },
+              { $limit: JSON.parse(pageSize) },
+              { $sort: { created_date: 1 } }
+            ]
+          };
         }
-      }
-      facet = {
-        metadata: [
-          { $count: "total" },
-          { $addFields: { page: decodedPageToken.page_offset } }
-        ],
-        data: [
-          { $skip: pageSize * decodedPageToken.page_offset },
-          { $limit: JSON.parse(pageSize) },
-          { $sort: { created_date: 1 } }
-        ]
-      };
-    }
+    
+        // TODO: build this array if other queries come in
+        const causeFilters = [
+          { $expr: { $eq: ["$status", "ACTIVE"] } },
+        ];
 
-    // TODO: build this array if other queries come in
-    const causeFilters = [
-      { $expr: { $eq: ["$status", "ACTIVE"] } },
-    ];
-
-    let fieldsToProject = {};
-    for (let key in CauseModel.schema.paths) {
-      if (key !== '_id') {
-        fieldsToProject = {
-          ...fieldsToProject,
-          [key]: `$${key}`
+        const buildQ = (value, name) => {
+          const splitValues = value.split(',');
+          let values = [];
+          for (let i = 0; i < splitValues.length; i++) {
+            const _value = splitValues[i];
+            values.push({
+              $eq: [`$${name}`, _value]
+            });
+          }
+          return values;
         }
-      }
-    }
 
-    const pipeline = [
-      {
-        $match: {
-          $and: [...causeFilters]
+        if (!!sector) {
+          const values = buildQ(sector, "sector");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
         }
-      },
-      {
-        $project: {
-          _id: {
-            $toString: "$_id"
+        if (!!time_of_day) {
+          const values = buildQ(time_of_day, "time_of_day");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
+        }
+        if (!!duration) {
+          const values = buildQ(duration, "duration");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
+        }
+        if (!!organization) {
+          const values = buildQ(organization, "organization");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
+        }
+        if (!!ages) {
+          const values = buildQ(ages, "ages");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
+        }
+
+        let dayFilters = null;
+        if (!!days) {
+          const arr = [];
+          const splitDays = days.split(',');
+          for (let i = 0; i < splitDays.length; i++) {
+            const day = splitDays[i];
+            arr.push({
+              days: { $in: [day, "$days"] },
+            });
+          }
+          dayFilters = {
+            $match: {
+              $or: [...arr]
+            }
+          }
+        }
+        let idealForFilters = null;
+        if (!!ideal_for) {
+          const arr = [];
+          const splitIdeals = ideal_for.split(',');
+          for (let i = 0; i < splitIdeals.length; i++) {
+            const ideal = splitIdeals[i];
+            arr.push({
+              ideal_for: { $in: [ideal, "$ideal_for"] },
+            });
+          }
+          idealForFilters = {
+            $match: {
+              $or: [...arr]
+            }
+          }
+        }
+    
+        let fieldsToProject = {};
+        for (let key in CauseModel.schema.paths) {
+          if (key !== '_id') {
+            fieldsToProject = {
+              ...fieldsToProject,
+              [key]: `$${key}`
+            }
+          }
+        }
+    
+        const pipeline = [
+          {
+            $match: {
+              $and: [...causeFilters]
+            }
           },
-          ...fieldsToProject
+          {
+            $project: {
+              _id: {
+                $toString: "$_id"
+              },
+              ...fieldsToProject
+            }
+          },
+          {
+            $lookup: {
+              from: "locations",
+              localField: "_id",
+              foreignField: "cause_id",
+              as: "locations"
+            }
+          },
+        ];
+        if (!!dayFilters) pipeline.push(dayFilters);
+        if (!!idealForFilters) pipeline.push(idealForFilters);
+    
+    
+        if (!!locations) {
+          const parsedLocations = JSON.parse(locations);
+          let locationQueries = [];
+          for (let i = 0; i < parsedLocations.length; i++) {
+            const location = parsedLocations[i];
+            const [city, province] = location.split(',');
+            if (city === 'Remote') {
+              locationQueries.push({
+                $and: [
+                  { 'locations.city': { $exists: true, $in: [city] } },
+                ]
+              });
+            } else {
+              locationQueries.push({
+                $and: [
+                  { 'locations.city': { $exists: true, $in: [city] } },
+                  { 'locations.province': { $exists: true, $in: [province] } }
+                ]
+              });
+            }
+          }
+    
+          pipeline.push({
+            "$match": {
+              $or: [...locationQueries]
+            }
+          });
         }
-      },
-      {
-        $lookup: {
-          from: "locations",
-          localField: "_id",
-          foreignField: "cause_id",
-          as: "locations"
+    
+        pipeline.push({
+          $facet: {
+            ...facet
+          }
+        });
+    
+        CauseModel.aggregate([...pipeline], (err, data) => {
+          if (err) {
+            console.log('ERROR:', err);
+            return resolve(null);
+          }
+
+          return resolve({
+            docs: data[0].data,
+            metaData: data[0].metadata
+          });
+        });
+
+      });
+    }
+
+    const allData = await aggregateCausesWithLocations(pageToken, pageSize, locations);
+    if (allData && allData.docs && allData.docs.length) {
+      const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
+      const { docs, metaData } = allData;
+      const totalCount = metaData[0].total;
+
+      let nextPageToken = null;
+      if (!!pageSize) {
+        // if there is no pageToken then we must be on page 0
+        if (pageSize && !decodedPageToken) {
+          nextPageToken = {
+            page_size: pageSize,
+            page_offset: 1
+          };
+        }
+        // otherwise, increment the page_offset
+        else if (pageSize && !!decodedPageToken) {
+          nextPageToken = {
+            page_size: decodedPageToken.page_size,
+            page_offset: decodedPageToken.page_offset + 1
+          };
+        }
+        // lastly, we are all out of documents, clear the next page token
+        if (!!nextPageToken) {
+          const { page_size, page_offset } = nextPageToken;
+          if (page_size * page_offset >= totalCount) {
+            nextPageToken = null;
+          }
         }
       }
-    ];
 
-
-    if (!!locations) {
-      const parsedLocations = JSON.parse(locations);
-      let locationQueries = [];
-      for (let i = 0; i < parsedLocations.length; i++) {
-        const location = parsedLocations[i];
-        const [city, province] = location.split(',');
-        if (city === 'Remote') {
-          locationQueries.push({
-            $and: [
-              { 'locations.city': { $exists: true, $in: [city] } },
-            ]
-          });
-        } else {
-          locationQueries.push({
-            $and: [
-              { 'locations.city': { $exists: true, $in: [city] } },
-              { 'locations.province': { $exists: true, $in: [province] } }
-            ]
-          });
-        }
-      }
-
-      pipeline.push({
-        "$match": {
-          $or: [...locationQueries]
+      return res.send({
+        data: {
+          docs: docs,
+          next_page_token: !!nextPageToken ? Base64.encode(JSON.stringify(nextPageToken)) : null
         }
       });
     }
 
-    pipeline.push({
-      $facet: {
-        ...facet
+    return res.status(200).send({
+      data: {
+        docs: []
       }
-    });
-
-    CauseModel.aggregate([...pipeline], (err, data) => {
-      console.log('\n\n--------------------');
-      if (err) {
-        console.log('ERROR:', err);
-        return res.send('ERROR:', err);
-      }
-
-      return res.status(200).send(data);
     });
 
     // CauseModel
