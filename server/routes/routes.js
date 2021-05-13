@@ -96,6 +96,7 @@ const routes = function () {
       ages,
       days,
       ideal_for,
+      search,
       ...rest
     } = req.query; 
     const query = buildQuery(rest);
@@ -271,7 +272,23 @@ const routes = function () {
         ];
         if (!!dayFilters) pipeline.push(dayFilters);
         if (!!idealForFilters) pipeline.push(idealForFilters);
-    
+        
+        // TODO: search certain fields by keyword
+        if (!!search) {
+          const nameRegex = new RegExp("^.*" + search + ".*$");
+          pipeline.push({
+            $match: {
+              $or: [
+                {
+                  "name": { $regex: nameRegex, $options: "i" },
+                },
+                {
+                  "organization": { $regex: nameRegex, $options: "i" }
+                }
+              ]
+            }
+          });
+        }
     
         if (!!locations) {
           const parsedLocations = JSON.parse(locations);
