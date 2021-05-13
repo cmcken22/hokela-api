@@ -136,7 +136,7 @@ const routes = function () {
             ]
           };
         } else if (!!pageSize && !!pageToken) {
-          console.log('3');
+          console.log('3', pageToken);
           const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
           if (!!pageSize && !!decodedPageToken) {
             if (decodedPageToken.page_size !== pageSize) {
@@ -346,35 +346,63 @@ const routes = function () {
       const { docs, metaData } = allData;
       const totalCount = metaData[0].total;
 
+
       let nextPageToken = null;
+      let nextMetaData = null;
+
       if (!!pageSize) {
         // if there is no pageToken then we must be on page 0
         if (pageSize && !decodedPageToken) {
           nextPageToken = {
             page_size: pageSize,
-            page_offset: 1
+            page_offset: 1,
+            total: totalCount
+          };
+          nextMetaData = {
+            page: 1,
+            count: docs.length,
+            total: totalCount,
+            size: JSON.parse(pageSize)
           };
         }
         // otherwise, increment the page_offset
         else if (pageSize && !!decodedPageToken) {
           nextPageToken = {
             page_size: decodedPageToken.page_size,
-            page_offset: decodedPageToken.page_offset + 1
+            page_offset: decodedPageToken.page_offset + 1,
+            total: totalCount
+          };
+          nextMetaData = {
+            page: nextPageToken.page_offset,
+            count: docs.length,
+            total: totalCount,
+            size: JSON.parse(pageSize)
           };
         }
         // lastly, we are all out of documents, clear the next page token
         if (!!nextPageToken) {
           const { page_size, page_offset } = nextPageToken;
+          nextMetaData = {
+            page: page_offset,
+            count: docs.length,
+            total: totalCount,
+            size: JSON.parse(pageSize)
+          };
           if (page_size * page_offset >= totalCount) {
             nextPageToken = null;
           }
         }
       }
 
+      console.log('pageToken:', pageToken);
+      console.log('decodedPageToken:', decodedPageToken);
+      console.log('nextPageToken:', nextPageToken);
+
       return res.send({
         data: {
           docs: docs,
-          next_page_token: !!nextPageToken ? Base64.encode(JSON.stringify(nextPageToken)) : null
+          next_page_token: !!nextPageToken ? Base64.encode(JSON.stringify(nextPageToken)) : null,
+          meta_data: { ...nextMetaData }
         }
       });
     }
