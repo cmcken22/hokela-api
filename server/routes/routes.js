@@ -117,9 +117,9 @@ const routes = function () {
               { $addFields: { page: 0 } }
             ],
             data: [
+              { $sort: { created_date: -1 } },
               { $skip: 0 },
-              { $limit: 10000000 },
-              { $sort: { created_date: -1 } }
+              { $limit: 10000000 }
             ]
           };
         } else if (!!pageSize && !pageToken) {
@@ -130,9 +130,9 @@ const routes = function () {
               { $addFields: { page: 0 } }
             ],
             data: [
+              { $sort: { created_date: -1 } },
               { $skip: 0 },
-              { $limit: JSON.parse(pageSize) },
-              { $sort: { created_date: -1 } }
+              { $limit: JSON.parse(pageSize) }
             ]
           };
         } else if (!!pageSize && !!pageToken) {
@@ -149,9 +149,9 @@ const routes = function () {
               { $addFields: { page: decodedPageToken.page_offset } }
             ],
             data: [
+              { $sort: { created_date: -1 } },
               { $skip: pageSize * decodedPageToken.page_offset },
-              { $limit: JSON.parse(pageSize) },
-              { $sort: { created_date: -1 } }
+              { $limit: JSON.parse(pageSize) }
             ]
           };
         }
