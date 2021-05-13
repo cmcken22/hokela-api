@@ -119,7 +119,7 @@ const routes = function () {
             data: [
               { $skip: 0 },
               { $limit: 10000000 },
-              { $sort: { created_date: 1 } }
+              { $sort: { created_date: -1 } }
             ]
           };
         } else if (!!pageSize && !pageToken) {
@@ -132,7 +132,7 @@ const routes = function () {
             data: [
               { $skip: 0 },
               { $limit: JSON.parse(pageSize) },
-              { $sort: { created_date: 1 } }
+              { $sort: { created_date: -1 } }
             ]
           };
         } else if (!!pageSize && !!pageToken) {
@@ -151,7 +151,7 @@ const routes = function () {
             data: [
               { $skip: pageSize * decodedPageToken.page_offset },
               { $limit: JSON.parse(pageSize) },
-              { $sort: { created_date: 1 } }
+              { $sort: { created_date: -1 } }
             ]
           };
         }
