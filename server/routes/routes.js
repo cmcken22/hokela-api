@@ -549,7 +549,7 @@ const routes = function () {
             cities: Array.from(citySet),
             provinces: Array.from(provinceSet),
             countries: Array.from(countrySet),
-            addresses: Array.from(addressSet),
+            locations: Array.from(addressSet),
           });
         })
         .catch((err) => {
@@ -610,7 +610,7 @@ const routes = function () {
       cities: Array.from(citySet),
       provinces: Array.from(provinceSet),
       countries: Array.from(countrySet),
-      addresses: Array.from(addressSet),
+      locations: Array.from(addressSet),
       organizations: Array.from(organizationSet)
     });
   });
