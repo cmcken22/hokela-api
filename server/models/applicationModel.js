@@ -23,7 +23,13 @@ const applicationSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    // required: true,
+    required: true,
+  },
+  gender: {
+    type: String,
+  },
+  age: {
+    type: Number,
   },
   status: {
     type: String,

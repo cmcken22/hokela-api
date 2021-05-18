@@ -70,10 +70,9 @@ const routes = function () {
     const newApplication = new ApplicationModel({
       cause_id,
       location_id,
-      email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      phone: user.phone,
+      ...user
     });
 
     newApplication.save(async (err, application) => {
