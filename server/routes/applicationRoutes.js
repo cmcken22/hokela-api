@@ -60,7 +60,7 @@ const routes = function () {
 
     const cause = await CauseModel.findById({ _id: cause_id });
     if (!cause) res.status(404).send('Cause not found!');
-
+    
     console.log('\n-------------------');
     console.log('cause_id:', cause_id);
     console.log('location_id:', location_id);
@@ -87,27 +87,77 @@ const routes = function () {
         const thankYouMsg = {
           to: email,
           from: 'conner.mckenna@hokela.ca',
-          subject: 'Thank you!',
+          subject: 'Thanks for your Application!',
           text: 'TEST!!!',
           html: `
-            <div style="width:100%">
-              <p>
+          <div style="width: 100%; background: rgb(248, 248, 248); padding: 20px 0px;">
+            <div style="width: 80%; margin: 0 auto; padding-top: 60px; background: white; padding: 40px 30px">
+              <div style="height: 75px; width: 100%; margin-bottom: 60px;">
+                <div style=" height: 100%; margin: 0 auto; background-image: url('https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_logo_original.png'); background-size: contain; background-position: center; background-repeat: no-repeat;">
+                </div>
+              </div>
+              <h1 style="font-family: open sans,Arial,sans-serif; color: #ff6161; text-align: center;">
+                Thank you for your application!
+              </h1>
+          
+              <br></br>
+          
+              <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
                 Hi ${first_name},
               </p>
-              <p>
-                Thank you for applying to <strong>${name}</strong>!
+              <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
+                Thank you for your interest and desire to volunteer! We will review your application and a representative will
+                contact you shortly regarding the next steps.
               </p>
+              <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
+                In the meantime, feel free to browse our other available positions!
+              </p>
+              <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
+                And as always, if you have any questions or would like to get in touch with us, you may contact us at
+                <a href="mailto:info@hokela.ca"
+                  style="color: #15c; font-family: helvetica,sans-serif; font-size: 16px; font-weight: 700; text-decoration: none;">info@hokela.ca</a>.
+              </p>
+          
               <br></br>
-              <img
-                src="https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_icon.png"
-                style="height:60px;width:60px"
-              ></img>
+          
+              <div style="display: inline-flex; align-items: center; width: 100%;">
+          
+                <div
+                  style="height: 39px; width: 185px; background: #ff6161; margin: auto; border-radius: 100px; display: inline-flex; margin-bottom: 20px;">
+                  <a href="https://test-hokela.herokuapp.com/causes"
+                    style="color: #ffffff; font-family: tahoma,sans-serif; font-size: 16px; text-align: center; margin: 0 auto; text-decoration: none; padding-top: 7px;">
+                    Find more causes
+                  </a>
+                </div>
+              </div>
+          
               <br></br>
-              <p>
-                For any questions please contact <strong>mathieu.mackay@hokela.ca</strong>
+          
+              <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
+                Please do not reply to this email.
+              </p>
+              <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
+                If you have any questions, you may contact us at <a href="mailto:info@hokela.ca"
+                  style="color: #15c; font-size: 12px; font-weight: 700; text-decoration: none;">info@hokela.ca</a>.
+              </p>
+              <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
+                To view our Terms of Use, click <a href="https://test-hokela.herokuapp.com/terms"
+                  style="color: #109fff; font-size: 12px; font-weight: 400;">here</a>.
+              </p>
+              <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
+                Toronto, Ontario, Canada
+              </p>
+          
+              <br></br>
+          
+              <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
+                <a href="https://test-hokela.herokuapp.com" style="color: #2f2e2c; text-decoration: none;">
+                  Go to Hokela
+                </a>
               </p>
             </div>
-          `,
+        </div>
+        `,
         }
 
         sgMail.send(thankYouMsg).then(() => {
@@ -119,53 +169,61 @@ const routes = function () {
         });
 
         if (contact && contact.email) {
-          const followUpEmail = {
-            to: contact.email,
-            from: 'conner.mckenna@hokela.ca',
-            subject: 'Hokela Info!',
-            text: 'TEST!!!',
-            html: `
-              <p>
-                User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!
-                <br></br>
-                Cause Owner: <strong>${contact.email}</strong>
-              </p>
-            `,
-          }
-          sgMail.send(followUpEmail)
-            .then(() => {
-              console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
-            })
-            .catch(err => {
+          const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          const valid = re.test(String(contact.email).toLowerCase());
+          if (valid) {
+            const followUpEmail = {
+              to: contact.email,
+              from: 'conner.mckenna@hokela.ca',
+              subject: 'Hokela Info!',
+              text: 'TEST!!!',
+              html: `
+                <p>
+                  User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!
+                  <br></br>
+                  Cause Owner: <strong>${contact.email}</strong>
+                </p>
+              `,
+            }
+            sgMail.send(followUpEmail)
+              .then(() => {
+                console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
+              })
+              .catch(err => {
+                console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
+                console.log('err:', err);
+              });
+            } else {
+              const err = `Invalid Email: ${contact.email}`;
               console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
               console.log('err:', err);
-            });
+          }
         }
 
-    //     // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
-    //     // if (created_by && created_by.email) {
-    //     //   users.push(created_by.email)
-    //     // }
+        // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
+        // if (created_by && created_by.email) {
+        //   users.push(created_by.email)
+        // }
 
-    //     // for (let i = 0; i < users.length; i++) {
-    //     //   const user = users[i];
-    //     //   console.log('user:', user);
-    //     //   console.log('sending follow up email to:', user);
-    //     //   const msg1 = {
-    //     //     to: user, // Change to your recipient
-    //     //     from: 'conner.mckenna@hokela.ca', // Change to your verified sender
-    //     //     subject: 'Hokela Info!',
-    //     //     text: 'TEST!!!',
-    //     //     html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
-    //     //   }
-    //     //   sgMail.send(msg1)
-    //     //     .then(() => {
-    //     //       console.log(`EMAIL SENT${i}:`, user);
-    //     //     })
-    //     //     .catch(err => {
-    //     //       console.log(`EMAIL ERR${i}:`, user);
-    //     //     })
-    //     // }
+        // for (let i = 0; i < users.length; i++) {
+        //   const user = users[i];
+        //   console.log('user:', user);
+        //   console.log('sending follow up email to:', user);
+        //   const msg1 = {
+        //     to: user, // Change to your recipient
+        //     from: 'conner.mckenna@hokela.ca', // Change to your verified sender
+        //     subject: 'Hokela Info!',
+        //     text: 'TEST!!!',
+        //     html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
+        //   }
+        //   sgMail.send(msg1)
+        //     .then(() => {
+        //       console.log(`EMAIL SENT${i}:`, user);
+        //     })
+        //     .catch(err => {
+        //       console.log(`EMAIL ERR${i}:`, user);
+        //     })
+        // }
 
         return res.status(200).send(application);
       }
