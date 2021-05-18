@@ -7,23 +7,20 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const ApplicationModel = require('../models/applicationModel');
+const LocationModel = require('../models/locationModel');
 const CauseModel = require('../models/causeModel');
 // const VolunteerController = require('../controllers/volunteerController');
 
 const routes = function () {
-  router.get('/', (req, res) => {
+  router.get('/', async (req, res) => {
     const {
       query: {
         cause_id,
-        location_id,
         email
       }
     } = req;
 
-    console.log('\n.............................');
-    console.log('cause_id:', cause_id);
-    console.log('location_id:', location_id);
-    console.log('email:', email);
+    const locations = await LocationModel.find({ cause_id });
 
     ApplicationModel
       .find({ cause_id, email })
@@ -31,7 +28,16 @@ const routes = function () {
         if (docs && docs.constructor === Array && docs.length === 0) {
           res.status(404).send({ message: 'No Application exists in the DB' });
         } else {
-          res.status(200).send(docs);
+          const appliedLocations = new Set();
+          for (let i = 0; i < docs.length; i++) {
+            const { location_id: locationId } = docs[i];
+            appliedLocations.add(locationId);
+          }
+
+          res.status(200).send({
+            locations: Array.from(appliedLocations),
+            applied_all: docs.length === locations.length
+          });
         }
       })
       .catch((err) => {
@@ -164,10 +170,6 @@ const routes = function () {
         return res.status(200).send(application);
       }
     });
-  });
-
-  router.patch('/:id', getUserInfo, async (req, res) => {
-    
   });
 
   router.delete('/:id', (req, res) => {
