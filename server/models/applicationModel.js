@@ -9,9 +9,21 @@ const applicationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  user_email: {
+  email: {
     type: String,
     required: true,
+  },
+  first_name: {
+    type: String,
+    required: true,
+  },
+  last_name: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    // required: true,
   },
   status: {
     type: String,
@@ -21,31 +33,7 @@ const applicationSchema = new mongoose.Schema({
   created_date: {
     type: Date,
     default: Date.now,
-  },
-  // last_modified_date: {
-  //   type: Date,
-  //   default: Date.now,
-  // },
-  // created_by: {
-  //   name: {
-  //     type: String,
-  //     // required: true,
-  //   },
-  //   email: {
-  //     type: String,
-  //     required: true,
-  //   },
-  // },
-  // updated_by: {
-  //   name: {
-  //     type: String,
-  //     required: false,
-  //   },
-  //   email: {
-  //     type: String,
-  //     required: false,
-  //   },
-  // },
+  }
 }, { versionKey: false });
 
 module.exports = mongoose.model('Application', applicationSchema);

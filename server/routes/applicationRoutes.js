@@ -11,24 +11,27 @@ const CauseModel = require('../models/causeModel');
 // const VolunteerController = require('../controllers/volunteerController');
 
 const routes = function () {
-  router.get('/', getUserInfo, (req, res) => {
-    // const query = buildQuery(req);
-
+  router.get('/', (req, res) => {
     const {
-      query: { cause_id, location_id },
-      user: { email },
+      query: {
+        cause_id,
+        location_id,
+        email
+      }
     } = req;
 
+    console.log('\n.............................');
     console.log('cause_id:', cause_id);
     console.log('location_id:', location_id);
+    console.log('email:', email);
 
     ApplicationModel
-      .find({ cause_id, user_email: email })
-      .then((doc) => {
-        if (doc && doc.constructor === Array && doc.length === 0) {
+      .find({ cause_id, email })
+      .then((docs) => {
+        if (docs && docs.constructor === Array && docs.length === 0) {
           res.status(404).send({ message: 'No Application exists in the DB' });
         } else {
-          res.status(200).send(doc);
+          res.status(200).send(docs);
         }
       })
       .catch((err) => {
@@ -40,31 +43,41 @@ const routes = function () {
     
   });
 
-  router.post('/', getUserInfo, async (req, res) => {
+  router.post('/', async (req, res) => {
     const {
-      body: { cause_id, location_id },
-      user: { email },
-      user
+      body: {
+        cause_id,
+        location_id,
+        user
+      },
     } = req;
 
     const cause = await CauseModel.findById({ _id: cause_id });
-    console.log('cause:', cause);
-    if (!cause) res.send(404).send('Cause not found!');
+    if (!cause) res.status(404).send('Cause not found!');
 
-    const { name, created_by } = cause;
-    console.log('name:', name);
+    console.log('\n-------------------');
+    console.log('cause_id:', cause_id);
+    console.log('location_id:', location_id);
+    console.log('user:', user);
+    console.log('-------------------\n');
 
     const newApplication = new ApplicationModel({
       cause_id,
       location_id,
-      user_email: email,
-      created_by: user
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      phone: user.phone,
     });
+
     newApplication.save(async (err, application) => {
       if (err) {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
+        const { name, contact } = cause;
+        const { first_name, email } = newApplication;
+
         const thankYouMsg = {
           to: email,
           from: 'conner.mckenna@hokela.ca',
@@ -72,6 +85,9 @@ const routes = function () {
           text: 'TEST!!!',
           html: `
             <div style="width:100%">
+              <p>
+                Hi ${first_name},
+              </p>
               <p>
                 Thank you for applying to <strong>${name}</strong>!
               </p>
@@ -88,11 +104,6 @@ const routes = function () {
           `,
         }
 
-        console.log('\n==============');
-        console.log('SENDING THANK YOU EMAIL TO:', email);
-        console.log('msg:', thankYouMsg);
-        console.log('==============\n');
-
         sgMail.send(thankYouMsg).then(() => {
           console.log('THANK YOU EMAIL SENT:', email);
         })
@@ -101,10 +112,9 @@ const routes = function () {
           console.log('err:', err);
         });
 
-        if (created_by && created_by.email) {
+        if (contact && contact.email) {
           const followUpEmail = {
-            to: created_by.email,
-            bcc: 'conner.mckenna94@gmail.com',
+            to: contact.email,
             from: 'conner.mckenna@hokela.ca',
             subject: 'Hokela Info!',
             text: 'TEST!!!',
@@ -112,44 +122,44 @@ const routes = function () {
               <p>
                 User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!
                 <br></br>
-                Cause Owner: <strong>${created_by.email}</strong>
+                Cause Owner: <strong>${contact.email}</strong>
               </p>
             `,
           }
           sgMail.send(followUpEmail)
             .then(() => {
-              console.log(`FOLLOW UP EMAIL SENT:`, user);
+              console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
             })
             .catch(err => {
-              console.log(`FOLLOW UP EMAIL ERR:`, user);
+              console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
               console.log('err:', err);
             });
         }
 
-        // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
-        // if (created_by && created_by.email) {
-        //   users.push(created_by.email)
-        // }
+    //     // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
+    //     // if (created_by && created_by.email) {
+    //     //   users.push(created_by.email)
+    //     // }
 
-        // for (let i = 0; i < users.length; i++) {
-        //   const user = users[i];
-        //   console.log('user:', user);
-        //   console.log('sending follow up email to:', user);
-        //   const msg1 = {
-        //     to: user, // Change to your recipient
-        //     from: 'conner.mckenna@hokela.ca', // Change to your verified sender
-        //     subject: 'Hokela Info!',
-        //     text: 'TEST!!!',
-        //     html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
-        //   }
-        //   sgMail.send(msg1)
-        //     .then(() => {
-        //       console.log(`EMAIL SENT${i}:`, user);
-        //     })
-        //     .catch(err => {
-        //       console.log(`EMAIL ERR${i}:`, user);
-        //     })
-        // }
+    //     // for (let i = 0; i < users.length; i++) {
+    //     //   const user = users[i];
+    //     //   console.log('user:', user);
+    //     //   console.log('sending follow up email to:', user);
+    //     //   const msg1 = {
+    //     //     to: user, // Change to your recipient
+    //     //     from: 'conner.mckenna@hokela.ca', // Change to your verified sender
+    //     //     subject: 'Hokela Info!',
+    //     //     text: 'TEST!!!',
+    //     //     html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
+    //     //   }
+    //     //   sgMail.send(msg1)
+    //     //     .then(() => {
+    //     //       console.log(`EMAIL SENT${i}:`, user);
+    //     //     })
+    //     //     .catch(err => {
+    //     //       console.log(`EMAIL ERR${i}:`, user);
+    //     //     })
+    //     // }
 
         return res.status(200).send(application);
       }
