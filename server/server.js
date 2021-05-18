@@ -83,11 +83,8 @@ const logAddress = () => {
   console.log('results:', results);
 }
 
-// mongoose.connect(`mongodb://${USER}:${PASSWORD}@${URL}`, options)
+// mongoose.connect(`mongodb://localhost:27017/${DATABASE}`, options) // for local development
 const uri = `mongodb+srv://${USER}:${PASSWORD}@${URL}?retryWrites=true&w=majority`;
-console.log('uri:', uri);
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 mongoose.connect(uri, options)
   .then(() => {
     console.log('Database connection successful');
