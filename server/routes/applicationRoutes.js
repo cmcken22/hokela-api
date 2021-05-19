@@ -58,8 +58,10 @@ const routes = function () {
     } = req;
 
     const cause = await CauseModel.findById({ _id: cause_id });
+    const location = await LocationModel.findById({ _id: location_id });
     if (!cause) res.status(404).send('Cause not found!');
-
+    if (!location) res.status(404).send('Location not found!');
+    
     console.log('\n-------------------');
     console.log('cause_id:', cause_id);
     console.log('location_id:', location_id);
@@ -79,7 +81,7 @@ const routes = function () {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
-        const { name, contact } = cause;
+        const { name, contact, organization } = cause;
         const { first_name, email } = newApplication;
 
         const thankYouMsg = {
@@ -87,7 +89,7 @@ const routes = function () {
           from: 'conner.mckenna@hokela.ca',
           subject: 'Thanks for your Application!',
           text: 'TEST!!!',
-          html: templates.thankYou(first_name)
+          html: templates.thankYou({ first_name })
         }
 
         sgMail.send(thankYouMsg).then(() => {
@@ -107,7 +109,13 @@ const routes = function () {
               from: 'conner.mckenna@hokela.ca',
               subject: 'Hokela Info!',
               text: 'TEST!!!',
-              html: templates.followUp(email, name, contact.email)
+              html: templates.followUp({
+                causeName: name,
+                contactEmail: contact.email,
+                organization,
+                location: location.city.toLowerCase() === 'remote' ? `${location.city}` : `${location.city}, ${location.province}, ${location.country}`,
+                ...user,
+              })
             }
             sgMail.send(followUpEmail)
               .then(() => {

@@ -12,6 +12,7 @@ const CauseModel = require('../models/causeModel');
 const LocationModel = require('../models/locationModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
+
 const {
   buildQuery,
   buildFacet,
@@ -535,7 +536,7 @@ const routes = function () {
       });
   });
 
-  router.delete('/', (req, res) => {
+  router.delete('/', validateAdmin, (req, res) => {
     
   });
 
