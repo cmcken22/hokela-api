@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { buildQuery } = require('../util/helpers');
 const { getUserInfo } = require('../middlewares/auth');
 const { networkInterfaces } = require('os');
 const path = require('path');
@@ -13,6 +12,12 @@ const CauseModel = require('../models/causeModel');
 const LocationModel = require('../models/locationModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
+const {
+  buildQuery,
+  buildFacet,
+  buildAggregateQuery,
+  buildAggregateQueryForArray
+} = require('../util/helpers');
 
 const Multer = require('multer');
 const MulterGoogleCloudStorage = require('@igorivaniuk/multer-google-storage');
@@ -99,7 +104,7 @@ const routes = function () {
       search,
       ...rest
     } = req.query; 
-    const query = buildQuery(rest);
+    // const query = buildQuery(rest);
 
     console.log('\n-----------');
     console.log('pageSize:', pageSize);
@@ -108,134 +113,41 @@ const routes = function () {
 
     const aggregateCausesWithLocations = (pageToken, pageSize, locations) => {
       return new Promise(async (resolve) => {
-        let facet = {};
-        if (!pageSize) {
-          console.log('1');
-          facet = {
-            metadata: [
-              { $count: "total" },
-              { $addFields: { page: 0 } }
-            ],
-            data: [
-              { $sort: { created_date: -1 } },
-              { $skip: 0 },
-              { $limit: 10000000 }
-            ]
-          };
-        } else if (!!pageSize && !pageToken) {
-          console.log('2');
-          facet = {
-            metadata: [
-              { $count: "total" },
-              { $addFields: { page: 0 } }
-            ],
-            data: [
-              { $sort: { created_date: -1 } },
-              { $skip: 0 },
-              { $limit: JSON.parse(pageSize) }
-            ]
-          };
-        } else if (!!pageSize && !!pageToken) {
-          console.log('3', pageToken);
-          const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
-          if (!!pageSize && !!decodedPageToken) {
-            if (decodedPageToken.page_size !== pageSize) {
-              return res.status(400).send('Page size does not match!');
-            }
-          }
-          facet = {
-            metadata: [
-              { $count: "total" },
-              { $addFields: { page: decodedPageToken.page_offset } }
-            ],
-            data: [
-              { $sort: { created_date: -1 } },
-              { $skip: pageSize * decodedPageToken.page_offset },
-              { $limit: JSON.parse(pageSize) }
-            ]
-          };
-        }
+        const facet = buildFacet(pageSize, pageToken);
     
         // TODO: build this array if other queries come in
         const causeFilters = [
           { $expr: { $eq: ["$status", "ACTIVE"] } },
         ];
 
-        const buildQ = (value, name) => {
-          const splitValues = value.split(',');
-          let values = [];
-          for (let i = 0; i < splitValues.length; i++) {
-            const _value = splitValues[i];
-            values.push({
-              $eq: [`$${name}`, _value]
-            });
-          }
-          return values;
-        }
-
         if (!!sector) {
-          const values = buildQ(sector, "sector");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-        if (!!time_of_day) {
-          const values = buildQ(time_of_day, "time_of_day");
+          const values = buildAggregateQuery(sector, "sector");
           causeFilters.push({
             $expr: { $or: [...values] },
           });
         }
         if (!!duration) {
-          const values = buildQ(duration, "duration");
+          const values = buildAggregateQuery(duration, "duration");
           causeFilters.push({
             $expr: { $or: [...values] },
           });
         }
         if (!!organization) {
-          const values = buildQ(organization, "organization");
+          const values = buildAggregateQuery(organization, "organization");
           causeFilters.push({
             $expr: { $or: [...values] },
           });
         }
         if (!!ages) {
-          const values = buildQ(ages, "ages");
+          const values = buildAggregateQuery(ages, "ages");
           causeFilters.push({
             $expr: { $or: [...values] },
           });
         }
 
-        let dayFilters = null;
-        if (!!days) {
-          const arr = [];
-          const splitDays = days.split(',');
-          for (let i = 0; i < splitDays.length; i++) {
-            const day = splitDays[i];
-            arr.push({
-              days: { $in: [day, "$days"] },
-            });
-          }
-          dayFilters = {
-            $match: {
-              $or: [...arr]
-            }
-          }
-        }
-        let idealForFilters = null;
-        if (!!ideal_for) {
-          const arr = [];
-          const splitIdeals = ideal_for.split(',');
-          for (let i = 0; i < splitIdeals.length; i++) {
-            const ideal = splitIdeals[i];
-            arr.push({
-              ideal_for: { $in: [ideal, "$ideal_for"] },
-            });
-          }
-          idealForFilters = {
-            $match: {
-              $or: [...arr]
-            }
-          }
-        }
+        const dayFilters = buildAggregateQueryForArray(days, 'days');
+        const timeOfDayFilters = buildAggregateQueryForArray(time_of_day, 'time_of_day');
+        const idealForFilters = buildAggregateQueryForArray(ideal_for, 'ideal_for');
     
         let fieldsToProject = {};
         for (let key in CauseModel.schema.paths) {
@@ -271,6 +183,7 @@ const routes = function () {
           },
         ];
         if (!!dayFilters) pipeline.push(dayFilters);
+        if (!!timeOfDayFilters) pipeline.push(timeOfDayFilters);
         if (!!idealForFilters) pipeline.push(idealForFilters);
         
         // TODO: search certain fields by keyword
@@ -412,41 +325,6 @@ const routes = function () {
         docs: []
       }
     });
-
-    // CauseModel
-    //   .find({ ...query })
-    //   .sort({ 'created_date': 'desc' })
-    //   .exec(async (err, docs) => {
-    //     if (docs && docs.constructor === Array && docs.length === 0) {
-    //       res.send({ message: 'No Causes exists in the DB' });
-    //     } else {
-    //       const result = [];
-    //       for (let i = 0; i < docs.length; i++) {
-    //         let doc = docs[i];
-    //         let locationQuery = {
-    //           cause_id: doc._id,
-    //         };
-    //         if (locations) {
-    //           locationQuery = {
-    //             ...locationQuery,
-    //             locations
-    //           }
-    //         }
-
-    //         locationQuery = buildQuery(locationQuery);
-    //         let locs = await LocationModel.find({ ...locationQuery });
-    //         if (locs && locs.length) {
-    //           doc = {
-    //             ...doc._doc,
-    //             locations: locs
-    //           };
-    //           result.push(doc);
-    //         }
-    //       }
-
-    //       res.send(result);
-    //     }
-    //   });
   });
 
   router.get('/images', async (req, res) => {

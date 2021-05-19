@@ -88,7 +88,91 @@ const buildUserInfo = (res) => {
   return user;
 }
 
+const buildFacet = (pageSize, pageToken) => {
+  let facet = {};
+  if (!pageSize) {
+    facet = {
+      metadata: [
+        { $count: "total" },
+        { $addFields: { page: 0 } }
+      ],
+      data: [
+        { $sort: { created_date: -1 } },
+        { $skip: 0 },
+        { $limit: 10000000 }
+      ]
+    };
+  } else if (!!pageSize && !pageToken) {
+    facet = {
+      metadata: [
+        { $count: "total" },
+        { $addFields: { page: 0 } }
+      ],
+      data: [
+        { $sort: { created_date: -1 } },
+        { $skip: 0 },
+        { $limit: JSON.parse(pageSize) }
+      ]
+    };
+  } else if (!!pageSize && !!pageToken) {
+    const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
+    if (!!pageSize && !!decodedPageToken) {
+      if (decodedPageToken.page_size !== pageSize) {
+        return res.status(400).send('Page size does not match!');
+      }
+    }
+    facet = {
+      metadata: [
+        { $count: "total" },
+        { $addFields: { page: decodedPageToken.page_offset } }
+      ],
+      data: [
+        { $sort: { created_date: -1 } },
+        { $skip: pageSize * decodedPageToken.page_offset },
+        { $limit: JSON.parse(pageSize) }
+      ]
+    };
+  }
+
+  return facet;
+}
+
+const buildAggregateQuery = (value, name) => {
+  const splitValues = value.split(',');
+  let values = [];
+  for (let i = 0; i < splitValues.length; i++) {
+    const _value = splitValues[i];
+    values.push({
+      $eq: [`$${name}`, _value]
+    });
+  }
+  return values;
+}
+
+const buildAggregateQueryForArray = (options, field) => {
+  let filters = null;
+  if (!!options) {
+    const arr = [];
+    const splitOptions = options.split(',');
+    for (let i = 0; i < splitOptions.length; i++) {
+      const value = splitOptions[i];
+      arr.push({
+        [field]: { $in: [value, `$${field}`] },
+      });
+    }
+    filters = {
+      $match: {
+        $or: [...arr]
+      }
+    };
+  }
+  return filters;
+}
+
 module.exports = {
   buildQuery,
-  buildUserInfo
+  buildUserInfo,
+  buildFacet,
+  buildAggregateQuery,
+  buildAggregateQueryForArray
 };

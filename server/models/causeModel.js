@@ -15,7 +15,7 @@ const causeSchema = new mongoose.Schema({
     type: String,
   },
   time_of_day: {
-    type: String
+    type: Array
   },
   days: {
     type: Array
