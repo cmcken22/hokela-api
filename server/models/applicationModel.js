@@ -31,6 +31,13 @@ const applicationSchema = new mongoose.Schema({
   age: {
     type: Number,
   },
+  additional_info: {
+    type: String,
+  },
+  found_by: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
     required: true,

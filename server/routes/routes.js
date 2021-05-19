@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserInfo } = require('../middlewares/auth');
+const { getUserInfo, validateAdmin } = require('../middlewares/auth');
 const { networkInterfaces } = require('os');
 const path = require('path');
 const fs = require('fs');
@@ -53,42 +53,6 @@ const uploadHandler = Multer({
 
 
 const routes = function () {
-  router.get('/test', (req, res) => {
-    const fileName = req.query.fileName;
-    console.log('fileName:', fileName);
-    const filePath = fileName;
-
-    // Check if file specified by the filePath exists 
-    fs.exists(filePath, function (exists) {
-      if (exists) {
-        // Content-type is very interesting part that guarantee that
-        // Web browser will handle response in an appropriate manner.
-        res.writeHead(200, {
-          "Content-Type": "application/octet-stream",
-          "Content-Disposition": "attachment; filename=" + fileName
-        });
-        fs.createReadStream(filePath).pipe(res);
-      } else {
-        res.writeHead(400, { "Content-Type": "text/plain" });
-        res.end("ERROR File does not exist");
-      }
-    });
-  });
-
-  router.get('/test2', (req, res) => {
-    // console.log('\n---------------');
-    const p = path.resolve('./');
-    // console.log('p:', p);
-    fs.readdir(p, (err, files) => {
-      const allFiles = [];
-      files.forEach(file => {
-        console.log(file);
-        allFiles.push(file);
-      });
-      return res.status(200).send(allFiles);
-    });
-  });
-
   router.get('/', async (req, res) => {
     const {
       page_token: pageToken,
@@ -535,7 +499,7 @@ const routes = function () {
       });
   });
 
-  router.post('/', getUserInfo, async (req, res) => {
+  router.post('/', validateAdmin, getUserInfo, async (req, res) => {
     const createCauesReq = await CauseController.createCause(req.body, req.user);
     if (createCauesReq.status !== 200) {
       res.status(createCauesReq.status).send(createCauesReq.data.message);
@@ -545,8 +509,7 @@ const routes = function () {
     res.status(createCauesReq.status).send(data);
   });
 
-  router.patch('/:id', getUserInfo, async (req, res) => {
-    console.log('req.user', req.user);
+  router.patch('/:id', validateAdmin, getUserInfo, async (req, res) => {
     const { params: { id } } = req;
     const updateCaueReq = await CauseController.updateCause(id, req.body, req.user);
     if (updateCaueReq.status !== 200) {
@@ -557,7 +520,7 @@ const routes = function () {
     res.status(updateCaueReq.status).send(data);
   });
 
-  router.delete('/:id', (req, res) => {
+  router.delete('/:id', validateAdmin, (req, res) => {
     CauseModel
       .findByIdAndDelete(req.params.id, (err, cause) => {
         if (err) {
