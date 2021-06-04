@@ -25,11 +25,9 @@ const applicationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  gender: {
+  age_group: {
     type: String,
-  },
-  age: {
-    type: Number,
+    required: true,
   },
   additional_info: {
     type: String,
