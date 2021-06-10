@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
 const Base64 = require('js-base64').Base64;
+const axios = require('axios');
 
 const mongoose = require('mongoose');
 const CauseModel = require('../models/causeModel');
@@ -69,12 +70,6 @@ const routes = function () {
       search,
       ...rest
     } = req.query; 
-    // const query = buildQuery(rest);
-
-    console.log('\n-----------');
-    console.log('pageSize:', pageSize);
-    console.log('pageToken:', pageToken);
-    console.log('-----------\n');
 
     const aggregateCausesWithLocations = (pageToken, pageSize, locations) => {
       return new Promise(async (resolve) => {
@@ -272,9 +267,9 @@ const routes = function () {
         }
       }
 
-      console.log('pageToken:', pageToken);
-      console.log('decodedPageToken:', decodedPageToken);
-      console.log('nextPageToken:', nextPageToken);
+      // console.log('pageToken:', pageToken);
+      // console.log('decodedPageToken:', decodedPageToken);
+      // console.log('nextPageToken:', nextPageToken);
 
       return res.send({
         data: {
@@ -290,6 +285,48 @@ const routes = function () {
         docs: []
       }
     });
+  });
+
+  router.get('/find-page/:id', async (req, res) => {
+    const {
+      params: { id },
+      query
+    } = req;
+
+    const serializeQuery = function (obj) {
+      var str = [];
+      for (var p in obj)
+        if (obj.hasOwnProperty(p)) {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+      return str.join("&");
+    }
+
+    const queryString = serializeQuery(query);
+    let URL = `${process.env.API_URL}/cause-api/v1/causes`;
+    if (queryString) URL = `${URL}?${queryString}`;
+    
+    const getPages = async (URL, nextPageToken, pages) => {
+      const result = await axios.get(!!nextPageToken ? `${URL}&page_token=${nextPageToken}` : URL);
+      if (result.status === 200 && result.data) {
+        const { data: { data } } = result;
+        const { docs, next_page_token } = data;
+        pages.push(data);
+        if (docs && docs.length) {
+          const currentCause = docs.find(cause => cause._id === id);
+          if (currentCause) {
+            return pages;
+          } else if (next_page_token) {
+            return getPages(URL, next_page_token, pages);
+          }
+        }
+      }
+      return pages;
+    }
+    const pages = await getPages(URL, null, []);
+    console.log('pages:', pages);
+
+    return res.status(200).send({ data: { pages } });
   });
 
   router.get('/images', async (req, res) => {
