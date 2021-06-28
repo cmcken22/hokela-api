@@ -10,7 +10,7 @@ const sendContactUsEmail = (data = {}) => {
       // TODO: replace with our info email
       to: 'conner.mckenna@hokela.ca',
       from: 'conner.mckenna@hokela.ca',
-      subject: 'User email received!',
+      subject: `User email received! (${email})`,
       text: 'TEST!!!',
       html: templates.contactUs({ first_name: name, email, message })
     }
