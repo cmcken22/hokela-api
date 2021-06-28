@@ -5,6 +5,7 @@ const { getUserInfo } = require('../middlewares/auth');
 
 const VolunteerModel = require('../models/volunteerModel');
 const VolunteerController = require('../controllers/volunteerController');
+const EmailController = require('../controllers/emailController');
 
 const routes = function () {
   router.get('/', (req, res) => {
@@ -56,6 +57,14 @@ const routes = function () {
     }
     const { data } = updateVolunteerReq;
     res.status(updateVolunteerReq.status).send(data);
+  });
+
+  router.post('/email', async (req, res) => {
+    const { body: { type, name, email, message } } = req;
+
+    const emailRes = await EmailController.sendEmail(type, { name, email, message });
+    if (emailRes === true) return res.status(200).send({ message: 'email sent!' });
+    return res.status(500).send({ error: emailRes });
   });
 
   router.delete('/:id', (req, res) => {

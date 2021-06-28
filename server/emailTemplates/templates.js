@@ -14,6 +14,18 @@ const templates = {
     const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
     const html = formatString(data, { ...variables });
     return html;
+  },
+  contactUs: (variables = {}) => {
+    const filePath = path.resolve(__dirname, './contactUs.html');
+    const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
+    const html = formatString(data, { ...variables });
+    return html;
+  },
+  thankYouForContactingUs: (variables = {}) => {
+    const filePath = path.resolve(__dirname, './thankYouForContactingUs.html');
+    const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
+    const html = formatString(data, { ...variables });
+    return html;
   }
 }
 
