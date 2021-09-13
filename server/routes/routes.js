@@ -461,6 +461,8 @@ const routes = function () {
     const countrySet = new Set();
     const addressSet = new Set();
     const organizationSet = new Set();
+    const areaSet = new Set();
+    const otherSkillsSet = new Set();
 
     const locations = await LocationModel.find();
     if (locations && locations.length) {
@@ -477,12 +479,20 @@ const routes = function () {
       }
     }
 
+    console.clear();
     const causes = await CauseModel.find();
     if (causes && causes.length) {
       for (let i = 0; i < causes.length; i++) {
         const doc = causes[i];
-        const { organization } = doc;
+        const { organization, area, other_skills } = doc;
         if (!!organization) organizationSet.add(organization);
+        if (!!area) areaSet.add(area);
+        if (!!other_skills) {
+          for (let i = 0; i < other_skills.length; i++) {
+            const otherSkill = other_skills[i];
+            otherSkillsSet.add(otherSkill);
+          }
+        }
       }
     }
 
@@ -491,7 +501,9 @@ const routes = function () {
       provinces: Array.from(provinceSet),
       countries: Array.from(countrySet),
       locations: Array.from(addressSet),
-      organizations: Array.from(organizationSet)
+      organizations: Array.from(organizationSet),
+      areas: Array.from(areaSet),
+      otherSkills: Array.from(otherSkillsSet)
     });
   });
 
