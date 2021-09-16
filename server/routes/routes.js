@@ -486,7 +486,7 @@ const routes = function () {
         const doc = causes[i];
         const { organization, area, other_skills } = doc;
         if (!!organization) organizationSet.add(organization);
-        if (!!area) areaSet.add(area);
+        // if (!!area) areaSet.add(area);
         if (!!other_skills) {
           for (let i = 0; i < other_skills.length; i++) {
             const otherSkill = other_skills[i];
@@ -502,7 +502,7 @@ const routes = function () {
       countries: Array.from(countrySet),
       locations: Array.from(addressSet),
       organizations: Array.from(organizationSet),
-      areas: Array.from(areaSet),
+      // areas: Array.from(areaSet),
       otherSkills: Array.from(otherSkillsSet)
     });
   });
