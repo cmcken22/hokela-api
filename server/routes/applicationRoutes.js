@@ -86,7 +86,7 @@ const routes = function () {
 
         const thankYouMsg = {
           to: email,
-          from: 'conner.mckenna@hokela.ca',
+          from: 'info@hokela.ca',
           subject: 'Thanks for your Application!',
           text: 'TEST!!!',
           html: templates.thankYou({ first_name })
@@ -106,7 +106,7 @@ const routes = function () {
           if (valid) {
             const followUpEmail = {
               to: contact.email,
-              from: 'conner.mckenna@hokela.ca',
+              from: 'info@hokela.ca',
               subject: 'Hokela Info!',
               text: 'TEST!!!',
               html: templates.followUp({

@@ -8,8 +8,8 @@ const sendContactUsEmail = (data = {}) => {
     const { name, email, message } = data;
     const thankYouMsg = {
       // TODO: replace with our info email
-      to: 'conner.mckenna@hokela.ca',
-      from: 'conner.mckenna@hokela.ca',
+      to: 'info@hokela.ca',
+      from: 'info@hokela.ca',
       subject: `User email received! (${email})`,
       text: 'TEST!!!',
       html: templates.contactUs({ first_name: name, email, message })
@@ -32,7 +32,7 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
     const { name, email, message } = data;
     const thankYouMsg = {
       to: email,
-      from: 'conner.mckenna@hokela.ca',
+      from: 'info@hokela.ca',
       subject: 'Thanks for Contacting Us!',
       text: 'TEST!!!',
       html: templates.thankYouForContactingUs({ first_name: name, message })
