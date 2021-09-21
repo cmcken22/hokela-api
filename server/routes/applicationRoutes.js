@@ -100,37 +100,39 @@ const routes = function () {
           console.log('err:', err);
         });
 
-        if (contact && contact.email) {
-          const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          const valid = re.test(String(contact.email).toLowerCase());
-          if (valid) {
-            const followUpEmail = {
-              to: contact.email,
-              from: 'info@hokela.ca',
-              subject: 'Hokela Info!',
-              text: 'TEST!!!',
-              html: templates.followUp({
-                causeName: name,
-                contactEmail: contact.email,
-                organization,
-                location: location.city.toLowerCase() === 'remote' ? `${location.city}` : `${location.city}, ${location.province}, ${location.country}`,
-                ...user,
-              })
-            }
-            sgMail.send(followUpEmail)
-              .then(() => {
-                console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
-              })
-              .catch(err => {
-                console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
-                console.log('err:', err);
-              });
-            } else {
-              const err = `Invalid Email: ${contact.email}`;
-              console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
-              console.log('err:', err);
-          }
-        }
+        // commented out for testing purposes
+        // if (contact && contact.email) {
+        //   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        //   const valid = re.test(String(contact.email).toLowerCase());
+        //   if (valid) {
+        //     const followUpEmail = {
+        //       to: contact.email,
+        //       from: 'info@hokela.ca',
+        //       subject: 'Hokela Info!',
+        //       text: 'TEST!!!',
+        //       html: templates.followUp({
+        //         causeName: name,
+        //         contactEmail: contact.email,
+        //         organization,
+        //         location: location.city.toLowerCase() === 'remote' ? `${location.city}` : `${location.city}, ${location.province}, ${location.country}`,
+        //         ...user,
+        //       })
+        //     }
+        //     sgMail.send(followUpEmail)
+        //       .then(() => {
+        //         console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
+        //       })
+        //       .catch(err => {
+        //         console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
+        //         console.log('err:', err);
+        //       });
+        //     } else {
+        //       const err = `Invalid Email: ${contact.email}`;
+        //       console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
+        //       console.log('err:', err);
+        //   }
+        // }
+        // commented out for testing purposes
 
         // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
         // if (created_by && created_by.email) {

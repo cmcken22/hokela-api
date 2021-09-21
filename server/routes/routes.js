@@ -479,7 +479,6 @@ const routes = function () {
       }
     }
 
-    console.clear();
     const causes = await CauseModel.find();
     if (causes && causes.length) {
       for (let i = 0; i < causes.length; i++) {
