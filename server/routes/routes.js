@@ -63,6 +63,7 @@ const routes = function () {
       sector,
       time_of_day,
       duration,
+      skill,
       organization,
       ages,
       days,
@@ -100,6 +101,12 @@ const routes = function () {
         }
         if (!!ages) {
           const values = buildAggregateQuery(ages, "ages");
+          causeFilters.push({
+            $expr: { $or: [...values] },
+          });
+        }
+        if (!!skill) {
+          const values = buildAggregateQuery(skill, "area");
           causeFilters.push({
             $expr: { $or: [...values] },
           });
