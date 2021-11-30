@@ -69,16 +69,17 @@ const routes = function () {
       days,
       ideal_for,
       search,
+      sort_by,
       ...rest
     } = req.query; 
 
     const aggregateCausesWithLocations = (pageToken, pageSize, locations) => {
       return new Promise(async (resolve) => {
-        const facet = buildFacet(pageSize, pageToken);
+        const facet = buildFacet(pageSize, pageToken, sort_by === 'desc' ? 1 : -1);
     
         // TODO: build this array if other queries come in
         const causeFilters = [
-          { $expr: { $eq: ["$status", "ACTIVE"] } },
+          { $expr: { $eq: ["$status", "ACTIVE"] } }
         ];
 
         if (!!sector) {
@@ -130,7 +131,7 @@ const routes = function () {
           {
             $match: {
               $and: [...causeFilters]
-            }
+            },
           },
           {
             $project: {
@@ -147,13 +148,12 @@ const routes = function () {
               foreignField: "cause_id",
               as: "locations"
             }
-          },
+          }
         ];
         if (!!dayFilters) pipeline.push(dayFilters);
         if (!!timeOfDayFilters) pipeline.push(timeOfDayFilters);
         if (!!idealForFilters) pipeline.push(idealForFilters);
-        
-        // TODO: search certain fields by keyword
+
         if (!!search) {
           const nameRegex = new RegExp("^.*" + search + ".*$");
           pipeline.push({
@@ -226,7 +226,6 @@ const routes = function () {
       const { docs, metaData } = allData;
       const totalCount = metaData[0].total;
 
-
       let nextPageToken = null;
       let nextMetaData = null;
 
@@ -273,10 +272,6 @@ const routes = function () {
           }
         }
       }
-
-      // console.log('pageToken:', pageToken);
-      // console.log('decodedPageToken:', decodedPageToken);
-      // console.log('nextPageToken:', nextPageToken);
 
       return res.send({
         data: {
