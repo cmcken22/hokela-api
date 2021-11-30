@@ -88,7 +88,7 @@ const buildUserInfo = (res) => {
   return user;
 }
 
-const buildFacet = (pageSize, pageToken) => {
+const buildFacet = (pageSize, pageToken, createdDateSortOrder) => {
   let facet = {};
   if (!pageSize) {
     facet = {
@@ -97,7 +97,7 @@ const buildFacet = (pageSize, pageToken) => {
         { $addFields: { page: 0 } }
       ],
       data: [
-        { $sort: { created_date: -1 } },
+        { $sort: { created_date: createdDateSortOrder } },
         { $skip: 0 },
         { $limit: 10000000 }
       ]
@@ -109,7 +109,7 @@ const buildFacet = (pageSize, pageToken) => {
         { $addFields: { page: 0 } }
       ],
       data: [
-        { $sort: { created_date: -1 } },
+        { $sort: { created_date: createdDateSortOrder } },
         { $skip: 0 },
         { $limit: JSON.parse(pageSize) }
       ]
@@ -127,7 +127,7 @@ const buildFacet = (pageSize, pageToken) => {
         { $addFields: { page: decodedPageToken.page_offset } }
       ],
       data: [
-        { $sort: { created_date: -1 } },
+        { $sort: { created_date: createdDateSortOrder } },
         { $skip: pageSize * decodedPageToken.page_offset },
         { $limit: JSON.parse(pageSize) }
       ]
