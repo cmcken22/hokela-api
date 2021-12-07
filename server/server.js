@@ -17,6 +17,7 @@ const URL = process.env.MONGODB_URL;
 const DATABASE = process.env.MONGODB_DATABASE;
 
 const routes = require('./routes/routes.js');
+const locationRoutes = require('./routes/locationRoutes.js');
 const volunteerRoutes = require('./routes/volunteerRoutes.js');
 const applicationRoutes = require('./routes/applicationRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -47,6 +48,7 @@ app.use(bodyParser.urlencoded({ limit: '15mb', extended: true }));
 
 /* This mounts the routes in routes.js to the '/' route. */
 app.use('/cause-api/v1/causes', routes());
+app.use('/cause-api/v1/locations', locationRoutes());
 app.use('/cause-api/v1/volunteer', volunteerRoutes());
 app.use('/cause-api/v1/apply', applicationRoutes());
 app.use('/cause-api/v1/auth', authRoutes());
@@ -85,6 +87,7 @@ const logAddress = () => {
 
 // mongoose.connect(`mongodb://localhost:27017/${DATABASE}`, options) // for local development
 const uri = `mongodb+srv://${USER}:${PASSWORD}@${URL}?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://admin:hokela27941713@cluster0.js2og.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 mongoose.connect(uri, options)
   .then(() => {
     console.log('Database connection successful');
