@@ -14,12 +14,7 @@ const LocationModel = require('../models/locationModel');
 const CauseController = require('../controllers/causeController');
 const { hokelaCauses, allCauses } = require('../util/mockData');
 
-const {
-  buildQuery,
-  buildFacet,
-  buildAggregateQuery,
-  buildAggregateQueryForArray
-} = require('../util/helpers');
+const { aggregateCausesWithLocations } = require('../util/helpers');
 
 const Multer = require('multer');
 const MulterGoogleCloudStorage = require('@igorivaniuk/multer-google-storage');
@@ -58,169 +53,11 @@ const routes = function () {
   router.get('/', async (req, res) => {
     const {
       page_token: pageToken,
-      page_size: pageSize,
-      locations,
-      sector,
-      time_of_day,
-      duration,
-      skill,
-      organization,
-      ages,
-      days,
-      ideal_for,
-      search,
-      sort_by,
-      ...rest
+      page_size: pageSize
     } = req.query; 
 
-    const aggregateCausesWithLocations = (pageToken, pageSize, locations) => {
-      return new Promise(async (resolve) => {
-        const facet = buildFacet(pageSize, pageToken, sort_by === 'desc' ? 1 : -1);
-    
-        // TODO: build this array if other queries come in
-        const causeFilters = [
-          { $expr: { $eq: ["$status", "ACTIVE"] } }
-        ];
+    const allData = await aggregateCausesWithLocations(req.query);
 
-        if (!!sector) {
-          const values = buildAggregateQuery(sector, "sector");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-        if (!!duration) {
-          const values = buildAggregateQuery(duration, "duration");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-        if (!!organization) {
-          const values = buildAggregateQuery(organization, "organization");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-        if (!!ages) {
-          const values = buildAggregateQuery(ages, "ages");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-        if (!!skill) {
-          const values = buildAggregateQuery(skill, "area");
-          causeFilters.push({
-            $expr: { $or: [...values] },
-          });
-        }
-
-        const dayFilters = buildAggregateQueryForArray(days, 'days');
-        const timeOfDayFilters = buildAggregateQueryForArray(time_of_day, 'time_of_day');
-        const idealForFilters = buildAggregateQueryForArray(ideal_for, 'ideal_for');
-    
-        let fieldsToProject = {};
-        for (let key in CauseModel.schema.paths) {
-          if (key !== '_id') {
-            fieldsToProject = {
-              ...fieldsToProject,
-              [key]: `$${key}`
-            }
-          }
-        }
-    
-        const pipeline = [
-          {
-            $match: {
-              $and: [...causeFilters]
-            },
-          },
-          {
-            $project: {
-              _id: {
-                $toString: "$_id"
-              },
-              ...fieldsToProject
-            }
-          },
-          {
-            $lookup: {
-              from: "locations",
-              localField: "_id",
-              foreignField: "cause_id",
-              as: "locations"
-            }
-          }
-        ];
-        if (!!dayFilters) pipeline.push(dayFilters);
-        if (!!timeOfDayFilters) pipeline.push(timeOfDayFilters);
-        if (!!idealForFilters) pipeline.push(idealForFilters);
-
-        if (!!search) {
-          const nameRegex = new RegExp("^.*" + search + ".*$");
-          pipeline.push({
-            $match: {
-              $or: [
-                {
-                  "name": { $regex: nameRegex, $options: "i" },
-                },
-                {
-                  "organization": { $regex: nameRegex, $options: "i" }
-                }
-              ]
-            }
-          });
-        }
-    
-        if (!!locations) {
-          const parsedLocations = JSON.parse(locations);
-          let locationQueries = [];
-          for (let i = 0; i < parsedLocations.length; i++) {
-            const location = parsedLocations[i];
-            const [city, province] = location.split(',');
-            if (city === 'Remote') {
-              locationQueries.push({
-                $and: [
-                  { 'locations.city': { $exists: true, $in: [city] } },
-                ]
-              });
-            } else {
-              locationQueries.push({
-                $and: [
-                  { 'locations.city': { $exists: true, $in: [city] } },
-                  { 'locations.province': { $exists: true, $in: [province] } }
-                ]
-              });
-            }
-          }
-    
-          pipeline.push({
-            "$match": {
-              $or: [...locationQueries]
-            }
-          });
-        }
-    
-        pipeline.push({
-          $facet: {
-            ...facet
-          }
-        });
-    
-        CauseModel.aggregate([...pipeline], (err, data) => {
-          if (err) {
-            console.log('ERROR:', err);
-            return resolve(null);
-          }
-
-          return resolve({
-            docs: data[0].data,
-            metaData: data[0].metadata
-          });
-        });
-
-      });
-    }
-
-    const allData = await aggregateCausesWithLocations(pageToken, pageSize, locations);
     if (allData && allData.docs && allData.docs.length) {
       const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
       const { docs, metaData } = allData;
