@@ -244,7 +244,6 @@ const routes = function () {
     const fieldSet = new Set();
     
     if (field === 'locations') {
-      console.log('\n=================', field);
       const citySet = new Set();
       const provinceSet = new Set();
       const countrySet = new Set();
