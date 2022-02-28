@@ -1,4 +1,4 @@
-
+const { logObject } = require('../util/log.helper');
 const CauseModel = require('../models/causeModel');
 
 const formatMultiSearchQuery = (key, value) => {
@@ -151,7 +151,23 @@ const buildAggregateQuery = (value, name) => {
   return values;
 }
 
-const buildAggregateQueryForArray = (options, field) => {
+const buildAggregateQueryForArray = (options, field, op = 'eq') => {
+  let filters = [];
+  if (!!options) {
+    const parsedOptions = JSON.parse(options);
+    for (let i = 0; i < parsedOptions.length; i++) {
+      const value = parsedOptions[i];
+      if (op === 'eq') {
+        filters.push({ '$eq': [`$${field}`, value] });
+      } else if (op === 'in') {
+        filters.push({ [`${field}`]: { '$in': [value, `$${field}`] }});
+      }
+    }
+  }
+  return filters;
+}
+
+const buildAggregateQueryForArray_old = (options, field) => {
   let filters = null;
   if (!!options) {
     const arr = [];
@@ -192,44 +208,68 @@ const aggregateCausesWithLocations = (query) => {
     const facet = buildFacet(pageSize, pageToken, sort_by === 'desc' ? 1 : -1);
 
     // TODO: build this array if other queries come in
-    const causeFilters = [
+    let causeFilters = [
       { $expr: { $eq: ["$status", "ACTIVE"] } }
     ];
 
     if (!!sector) {
-      const values = buildAggregateQuery(sector, "sector");
+      const values = buildAggregateQueryForArray(sector, "sector");
       causeFilters.push({
         $expr: { $or: [...values] },
       });
     }
     if (!!duration) {
-      const values = buildAggregateQuery(duration, "duration");
+      const values = buildAggregateQueryForArray(duration, "duration");
       causeFilters.push({
         $expr: { $or: [...values] },
       });
     }
     if (!!organization) {
-      const values = buildAggregateQuery(organization, "organization");
+      const values = buildAggregateQueryForArray(organization, "organization");
       causeFilters.push({
         $expr: { $or: [...values] },
       });
     }
     if (!!ages) {
-      const values = buildAggregateQuery(ages, "ages");
+      const values = buildAggregateQueryForArray(ages, "ages");
       causeFilters.push({
         $expr: { $or: [...values] },
       });
     }
     if (!!skill) {
-      const values = buildAggregateQuery(skill, "area");
+      const values = buildAggregateQueryForArray(skill, "area");
       causeFilters.push({
         $expr: { $or: [...values] },
       });
     }
 
-    const dayFilters = buildAggregateQueryForArray(days, 'days');
-    const timeOfDayFilters = buildAggregateQueryForArray(time_of_day, 'time_of_day');
-    const idealForFilters = buildAggregateQueryForArray(ideal_for, 'ideal_for');
+    let dayFilters = null;
+    if (!!days) {
+      const values = buildAggregateQueryForArray(days, 'days', 'in');
+      dayFilters = {
+        '$match': {
+          '$or': [...values]
+        }
+      };
+    }
+    let timeOfDayFilters = null;
+    if (!!time_of_day) {
+      const values = buildAggregateQueryForArray(time_of_day, 'time_of_day', 'in');
+      timeOfDayFilters = {
+        '$match': {
+          '$or': [...values]
+        }
+      };
+    }
+    let idealForFilters = null;
+    if (!!ideal_for) {
+      const values = buildAggregateQueryForArray(ideal_for, 'ideal_for', 'in');
+      idealForFilters = {
+        '$match': {
+          '$or': [...values]
+        }
+      };
+    }
 
     let fieldsToProject = {};
     for (let key in CauseModel.schema.paths) {
@@ -264,6 +304,7 @@ const aggregateCausesWithLocations = (query) => {
         }
       }
     ];
+
     if (!!dayFilters) pipeline.push(dayFilters);
     if (!!timeOfDayFilters) pipeline.push(timeOfDayFilters);
     if (!!idealForFilters) pipeline.push(idealForFilters);
