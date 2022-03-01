@@ -231,10 +231,18 @@ const aggregateCausesWithLocations = (query) => {
       });
     }
     if (!!ages) {
-      const values = buildAggregateQueryForArray(ages, "ages");
-      causeFilters.push({
-        $expr: { $or: [...values] },
-      });
+      const parsedAges = JSON.parse(ages);
+      const allAgesSelected = !!parsedAges.find(x => x && x.toLowerCase() === 'all ages');
+
+      // if all ages is selected no need to apply a filter
+      if (!allAgesSelected) {
+        // if youth or adult is selected, All ages applies to them as well
+        parsedAges.push('All ages');
+        const values = buildAggregateQueryForArray(JSON.stringify(parsedAges), "ages");
+        causeFilters.push({
+          $expr: { $or: [...values] },
+        });
+      }
     }
     if (!!skill) {
       const values = buildAggregateQueryForArray(skill, "area");
@@ -273,7 +281,7 @@ const aggregateCausesWithLocations = (query) => {
 
     let fieldsToProject = {};
     for (let key in CauseModel.schema.paths) {
-      if (key !== '_id') {
+      if (key !== '_id' && key !== 'sections') {
         fieldsToProject = {
           ...fieldsToProject,
           [key]: `$${key}`
