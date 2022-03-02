@@ -281,8 +281,7 @@ const aggregateCausesWithLocations = (query) => {
 
     let fieldsToProject = {};
     for (let key in CauseModel.schema.paths) {
-      // if (key !== '_id' && key !== 'sections') {
-      if (key !== '_id') {
+      if (key !== '_id' && key !== 'sections') {
         fieldsToProject = {
           ...fieldsToProject,
           [key]: `$${key}`
