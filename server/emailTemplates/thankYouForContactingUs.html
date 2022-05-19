@@ -1,69 +1,244 @@
-<div style="width: 100%; background: rgb(248, 248, 248); padding: 20px 0px;">
-  <div style="width: 80%; margin: 0 auto; padding-top: 60px; background: white; padding: 40px 30px">
-    <div style="height: 75px; width: 100%; margin-bottom: 60px;">
-      <div style=" height: 100%; margin: 0 auto; background-image: url('https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_logo_original.png'); background-size: contain; background-position: center; background-repeat: no-repeat;">
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      @font-face {
+        font-family: "Lato";
+        /* src: url("https://storage.googleapis.com/hokela-bucket/fonts/Lato-Regular.ttf") format("truetype"); */
+        src: url("https://storage.googleapis.com/hokela-bucket/icons/Lato-Regular.ttf") format("truetype");
+      }
+      body {
+        padding: 0px;
+        margin: 0px;
+      }
+      .banner {
+        width: 100%; 
+        height: 200px;
+        position: relative;
+        background: linear-gradient(0deg, rgba(83,120,149,1) 0%, rgba(9,32,63,1) 100%);
+        padding: 25px 30px 38px 25px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+      }
+      .hokela-icon {
+        height: 31px;
+        width: 31px;
+        background-image: url(https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_icon.png);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .main-title {
+        /* font-family: "Lato"; */
+        font-family: "Lato";
+        /* src: url("https://storage.googleapis.com/hokela-bucket/fonts/Lato-Regular.ttf") format("truetype"); */
+        /* src: url("https://storage.googleapis.com/hokela-bucket/icons/Lato-Regular.ttf") format("truetype"); */
+
+        color: white;
+        font-size: 36px;
+        text-align: left;
+        max-width: 260px;
+        margin-top: 16px;
+        line-height: 1.36;
+        letter-spacing: 0.81px;
+        margin-bottom: 0px;
+        height: 98px;
+      }
+      .banner-image {
+        height: 90%;
+        width: 30%;
+        background-image: url(https://storage.googleapis.com/hokela-bucket/icons/email-banner-icon-1.svg);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .content {
+        width: 100%;
+        padding: 25px 30px 38px 25px;
+        background: white;
+        box-sizing: border-box;
+      }
+      .text {
+        font-family: tahoma,sans-serif;
+        color: #2f2e2c;
+        font-size: 16px;
+        line-height: 1.44;
+        letter-spacing: 0.2px;
+      }
+      .text--centered {
+        text-align: center;
+        color: white;
+      }
+      .link {
+        color: #15c;
+        font-family: helvetica,sans-serif;
+        font-size: 16px;
+        text-decoration: none;
+      }
+      .link--underline {
+        text-decoration: underline;
+      }
+      .link--white {
+        color: white;
+      }
+      .connect {
+        margin-top: 30px;
+        text-align: center;
+      }
+      .connect p {
+        margin: 0px;
+      }
+      .connect__icons {
+        height: 20px;
+        /* width: 100%; */
+        /* background: red; */
+        margin-top: 14px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .connect__icon {
+        height: 20px;
+        width: 20px;
+        /* background: blue; */
+        margin-right: 16px;
+        cursor: pointer;
+      }
+      .connect__icon:last-child {
+        margin-right: 0px;
+      }
+      .footer {
+        background: #09203f;
+        /* height: 20px; */
+        width: 100%;
+        box-sizing: border-box;
+        padding: 20px 25px 55px 25px;
+      }
+      .footer__logo {
+        height: 40px;
+        width: 46px;
+        background: red;
+        margin: 0 auto;
+        margin-bottom: 20px;
+      }
+      .footer button {
+        font-family: tahoma,sans-serif;
+        color: white;
+        background: #ff6161;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin: 0 auto;
+        display: block;
+        margin-top: 30px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="width: 100%; background: rgb(248, 248, 248);">
+      <div style="width: 100%; margin: 0 auto; background: white;">
+        <div class="banner">
+          <div>
+            <div class="hokela-icon"></div>
+            <h1 class="main-title">
+              Thank you for contacting us!
+            </h1>
+          </div>
+          <div class="banner-image"></div>
+        </div>
+        <div class="content">
+          <p class="text">
+            Hi {first_name},
+          </p>
+          <p class="text">
+            My name is Matt Mackay and I am the CEO and Co-Founder of Hokela.<br/>Thanks for reaching out!
+          </p>
+          <p class="text">
+            I wanted to let you know that we have received your message and a member of our team will be contacting you in the next 2 business days.
+          </p>
+          <p class="text">
+            In the meantime, you can check out the following resources:
+          </p>
+          
+          <ul>
+            <li><a href="https://hokela-prod-ux.herokuapp.com/about" target="_blank" class="link link--underline">About Hokela</a></li>
+            <li><a href="https://hokela-prod-ux.herokuapp.com/causes" target="_blank" class="link link--underline">Find causes</a></li>
+            <li><a href="https://hokela-prod-ux.herokuapp.com/find-volunteers" target="_blank" class="link link--underline">Find volunteers</a></li>
+          </ul>
+    
+          <p class="text">
+            If you have any additional questions, please contact us at
+            <a href="mailto:info@hokela.ca" class="link">info@hokela.ca</a>.
+            <br/> 
+            Have a wonderful day!
+          </p>
+          <br/> 
+          <p class="text">
+            Matt Mackay
+          </p>
+
+          <div class="connect">
+            <p class="text"><strong>Let's connect!</strong></p>
+            <div class="connect__icons">
+              <div
+                onclick="openLink('https://www.facebook.com/hokela.ca')"
+                class="connect__icon"
+                style="
+                  background-image: url(https://storage.googleapis.com/hokela-bucket/icons/Facebook.svg);
+                  background-size: contain;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                "
+              ></div>
+              <div
+                onclick="openLink('https://www.instagram.com/hokela.ca')"
+                class="connect__icon"
+                style="
+                  background-image: url(https://storage.googleapis.com/hokela-bucket/icons/Instagram.svg);
+                  background-size: contain;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                "
+              ></div>
+              <div
+                onclick="openLink('https://www.linkedin.com/company/hokela')"
+                class="connect__icon"
+                style="
+                  background-image: url(https://storage.googleapis.com/hokela-bucket/icons/LinkedIn.svg);
+                  background-size: contain;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="footer__logo"></div>
+          <p class="text text--centered">
+            <i>Copyright © 2022 Hokela Technologies. All rights reserved.</i>
+            <br/>
+            Do not reply to this email.
+            <br/>
+            For further questions, contact us at <a href="mailto:info@hokela.ca" class="link link--underline link--white">info@hokela.ca</a>.
+            <br/>
+            Click <a href="https://hokela-prod-ux.herokuapp.com/terms" target="_blank" class="link link--underline link--white">here</a> to view our Terms of Use.
+            <br/>
+            <br/>
+            Toronto, ON, Canada.
+          </p>
+          <button
+            onclick="openLink('https://hokela-prod-ux.herokuapp.com/')"
+          >Go to Hokela</button>
+        </div>
       </div>
     </div>
-    <h1 style="font-family: open sans,Arial,sans-serif; color: #ff6161; text-align: center;">
-      Thank you for contacting us!
-    </h1>
-
-    <br></br>
-
-    <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
-      Hi {first_name},
-    </p>
-    <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
-      Thank you for your interest! We will review your message and a representative will
-      contact you shortly.
-    </p>
-    <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
-      message summary:
-      <i>
-        {message}
-      </i>
-    </p>
-    <p style="font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 16px;">
-      And as always, if you have any questions or would like to get in touch with us, you may contact us at
-      <a href="mailto:info@hokela.ca"
-        style="color: #15c; font-family: helvetica,sans-serif; font-size: 16px; font-weight: 700; text-decoration: none;">info@hokela.ca</a>.
-    </p>
-
-    <!-- <br></br> -->
-
-    <!-- <div style="display: inline-flex; align-items: center; width: 100%;">
-      <div
-        style="height: 39px; width: 185px; background: #ff6161; margin: auto; border-radius: 100px; display: inline-flex; margin-bottom: 20px;">
-        <a href="https://test-hokela.herokuapp.com/causes"
-          style="color: #ffffff; font-family: tahoma,sans-serif; font-size: 16px; text-align: center; margin: 0 auto; text-decoration: none; padding-top: 7px;">
-          Find more causes
-        </a>
-      </div>
-    </div> -->
-
-    <br></br>
-
-    <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
-      Please do not reply to this email.
-    </p>
-    <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
-      If you have any questions, you may contact us at <a href="mailto:info@hokela.ca"
-        style="color: #15c; font-size: 12px; font-weight: 700; text-decoration: none;">info@hokela.ca</a>.
-    </p>
-    <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
-      To view our Terms of Use, click <a href="https://test-hokela.herokuapp.com/terms"
-        style="color: #109fff; font-size: 12px; font-weight: 400;">here</a>.
-    </p>
-    <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
-      Toronto, Ontario, Canada
-    </p>
-
-    <br></br>
-
-    <p style="text-align: center; font-family: tahoma,sans-serif; color: #2f2e2c; font-size: 12px;">
-      <a href="https://test-hokela.herokuapp.com" style="color: #2f2e2c; text-decoration: none;">
-        Go to Hokela
-      </a>
-    </p>
-  </div>
-</div>
+    <script>
+      function openLink(link) {
+        window.open(link, "_blank");
+      }
+    </script>
+  </body>
+</html>
