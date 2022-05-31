@@ -58,6 +58,7 @@ const emailController = {
         const emailRes = await sendContactUsEmail(data);
         if (emailRes !== true) return resolve(emailRes);
         const thankYouRes = await sendThankYouForContactingUsEmail(data);
+        console.log('thankYouRes:', thankYouRes);
         return resolve(thankYouRes);
       }
 
