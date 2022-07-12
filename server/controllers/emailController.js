@@ -50,15 +50,69 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
   })
 }
 
+const sendUserApplicationResult = (data = {}) => {
+  return new Promise((resolve) => {
+    const {
+      cause_id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      age_group,
+      location,
+      position,
+      organization,
+      additional_info
+    } = data;
+
+    const thankYouMsg = {
+      to: email,
+      from: 'info@hokela.ca',
+      subject: 'Thanks for Your Application!',
+      text: 'TEST!!!',
+      html: templates.userApplicationResult({
+        cause_id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        age_group,
+        location,
+        position,
+        organization,
+        additional_info: !!additional_info ? additional_info : 'N/A'
+      })
+    };
+
+    // console.log('thankYouMsg:', thankYouMsg);
+
+    sgMail.send(thankYouMsg).then((res) => {
+      console.log('THANK YOU EMAIL SENT:', email);
+      console.log('res:', res);
+      return resolve(true);
+    })
+    .catch(err => {
+      console.log('THANK YOU EMAIL ERR:', email);
+      console.log('err:', err);
+      return resolve(err);
+    });
+  })
+}
+
 const emailController = {
   sendEmail: (type, data = {}) => {
     return new Promise(async (resolve) => {
-  
+      console.log('\ndata:', data);
+
       if (type === 'contact-us') {
-        console.log('\ndata:', data);
-        // const emailRes = await sendContactUsEmail(data);
-        // if (emailRes !== true) return resolve(emailRes);
+        const emailRes = await sendContactUsEmail(data);
+        if (emailRes !== true) return resolve(emailRes);
         const thankYouRes = await sendThankYouForContactingUsEmail(data);
+        console.log('thankYouRes:', thankYouRes);
+        return resolve(thankYouRes);
+      }
+      if (type === 'user-application-results') {
+        const thankYouRes = await sendUserApplicationResult(data);
         console.log('thankYouRes:', thankYouRes);
         return resolve(thankYouRes);
       }

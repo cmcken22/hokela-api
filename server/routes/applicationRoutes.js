@@ -9,6 +9,8 @@ const validations = require('../middlewares/validations');
 const ApplicationModel = require('../models/applicationModel');
 const LocationModel = require('../models/locationModel');
 const CauseModel = require('../models/causeModel');
+const EmailController = require('../controllers/emailController');
+const formatLocation = require('../util/locationFormatter');
 
 const routes = function () {
   router.get('/', async (req, res) => {
@@ -64,7 +66,9 @@ const routes = function () {
     
     console.log('\n-------------------');
     console.log('cause_id:', cause_id);
+    console.log('cause:', cause);
     console.log('location_id:', location_id);
+    console.log('location:', location);
     console.log('user:', user);
     console.log('-------------------\n');
 
@@ -76,29 +80,28 @@ const routes = function () {
       ...user
     });
 
+    
     newApplication.save(async (err, application) => {
       if (err) {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
-        const { name, contact, organization } = cause;
-        const { first_name, email } = newApplication;
+        // const { name, contact, organization } = cause;
+        // const { first_name, email } = newApplication;
 
-        const thankYouMsg = {
-          to: email,
-          from: 'info@hokela.ca',
-          subject: 'Thanks for your Application!',
-          text: 'TEST!!!',
-          html: templates.thankYou({ first_name })
-        }
+        const emailInfo = {
+          cause_id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          location: formatLocation(location),
+          position: cause.name,
+          organization: cause.organization,
+          ...user,
+        };
 
-        sgMail.send(thankYouMsg).then(() => {
-          console.log('THANK YOU EMAIL SENT:', email);
-        })
-        .catch(err => {
-          console.log('THANK YOU EMAIL ERR:', email);
-          console.log('err:', err);
-        });
+        console.log('emailInfo:', emailInfo);
+
+        EmailController.sendEmail('user-application-results', emailInfo);
 
         // commented out for testing purposes
         // if (contact && contact.email) {

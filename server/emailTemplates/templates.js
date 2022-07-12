@@ -3,8 +3,8 @@ const fs = require('fs');
 const formatString = require('string-template');
 
 const templates = {
-  thankYou: (variables = {}) => {
-    const filePath = path.resolve(__dirname, './thankYou.html');
+  userApplicationResult: (variables = {}) => {
+    const filePath = path.resolve(__dirname, './userApplicationResult.html');
     const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
     const html = formatString(data, { ...variables });
     return html;

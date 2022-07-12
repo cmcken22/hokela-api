@@ -126,7 +126,7 @@
         width: 48px;
         object-fit: contain; 
       }
-      .footer .hokela-button {
+      .hokela-button {
         font-family: tahoma,sans-serif;
         color: white;
         background: #ff6161;
@@ -140,6 +140,35 @@
         max-width: 180px;
         text-align: center;
         text-decoration: none;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: auto;
+        margin-bottom: 20px;
+      }
+      tr {
+        border: 1px solid #c3c0be;
+        height: 35px;
+      }
+      td {
+        font-family: tahoma,sans-serif;
+        color: #2f2e2c;
+        font-size: 16px;
+        line-height: 1.44;
+        letter-spacing: 0.2px;
+      }
+      .cell-main {
+        padding: 8px 10px;
+        border-right: 1px solid #c3c0be;
+        background: #eff0f3;
+      }
+      .cell-main--no-wrap {
+        white-space: nowrap;
+      }
+      .cell-secondary {
+        padding: 8px 10px;
+        width: 100%;
       }
     </style>
   </head>
@@ -162,20 +191,75 @@
             Hi {first_name},
           </p>
           <p class="text">
-            My name is Matt Mackay and I am the CEO and Co-Founder of Hokela. Thanks for reaching out!
+            Thank you for applying to the 
+            <a
+              href="https://hokela-prod-ux.herokuapp.com/causes/61b12e9415ea3d001e3863d9" 
+            >{position}</a>
+            position at <strong>{organization}</strong>. Our mission is to make it easy for talented individuals, like yourself, to find and connect with meaningful causes.
           </p>
           <p class="text">
-            I wanted to let you know that we have received your message and a member of our team will be contacting you in the next 2 business days.
+            Just so you know, this is what you have sent us:
+          </p>
+
+          <table>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                First Name
+              </td>
+              <td class="cell-secondary">{first_name}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Last Name
+              </td>
+              <td class="cell-secondary">{last_name}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Email
+              </td>
+              <td class="cell-secondary">{email}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Phone
+              </td>
+              <td class="cell-secondary">{phone}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Age Group
+              </td>
+              <td class="cell-secondary">{age_group}</td>
+            </tr>
+            <tr>
+              <td class="cell-main">
+                Preferred volunteering location
+              </td>
+              <td class="cell-secondary">{location}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Additional information
+              </td>
+              <td class="cell-secondary">{additional_info}</td>
+            </tr>
+          </table>
+
+          <p class="text">
+            The information above has been forwarded to Green Future. If the organization chooses to proceed with your application, a representative will contact you at the email and/or phone number that you have provided.
           </p>
           <p class="text">
-            In the meantime, you can check out the following resources:
+            In the meantime, feel free to browse our other available positions.
           </p>
           
-          <ul>
-            <li><a href="https://hokela-prod-ux.herokuapp.com/about" target="_blank" class="link link--underline">About Hokela</a></li>
-            <li><a href="https://hokela-prod-ux.herokuapp.com/causes" target="_blank" class="link link--underline">Find causes</a></li>
-            <li><a href="https://hokela-prod-ux.herokuapp.com/find-volunteers" target="_blank" class="link link--underline">Find volunteers</a></li>
-          </ul>
+          <a
+            class="hokela-button"
+            href="https://hokela-prod-ux.herokuapp.com/causes"
+            style="color: white !important; background-color: #ff6161 !important;"
+          >
+            Find more causes
+          </a>
     
           <p class="text">
             If you have any additional questions, please contact us at
@@ -185,7 +269,7 @@
           </p>
           <!-- <br/>  -->
           <p class="text">
-            Matt Mackay
+            The Hokela Team
           </p>
 
           <div class="connect">
