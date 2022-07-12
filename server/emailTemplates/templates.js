@@ -22,7 +22,7 @@ const templates = {
     return html;
   },
   thankYouForContactingUs: (variables = {}) => {
-    const filePath = path.resolve(__dirname, './thankYouForContactingUs.html');
+    const filePath = path.resolve(__dirname, './thankYouForContactingUs--simple.html');
     const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
     const html = formatString(data, { ...variables });
     return html;

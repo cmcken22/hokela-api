@@ -7,7 +7,6 @@ const sendContactUsEmail = (data = {}) => {
   return new Promise((resolve) => {
     const { name, email, message } = data;
     const thankYouMsg = {
-      // TODO: replace with our info email
       to: 'info@hokela.ca',
       from: 'info@hokela.ca',
       subject: `User email received! (${email})`,
@@ -38,8 +37,9 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
       html: templates.thankYouForContactingUs({ first_name: name, message })
     }
   
-    sgMail.send(thankYouMsg).then(() => {
+    sgMail.send(thankYouMsg).then((res) => {
       console.log('THANK YOU EMAIL SENT:', email);
+      console.log('res:', res);
       return resolve(true);
     })
     .catch(err => {
@@ -55,8 +55,9 @@ const emailController = {
     return new Promise(async (resolve) => {
   
       if (type === 'contact-us') {
-        const emailRes = await sendContactUsEmail(data);
-        if (emailRes !== true) return resolve(emailRes);
+        console.log('\ndata:', data);
+        // const emailRes = await sendContactUsEmail(data);
+        // if (emailRes !== true) return resolve(emailRes);
         const thankYouRes = await sendThankYouForContactingUsEmail(data);
         console.log('thankYouRes:', thankYouRes);
         return resolve(thankYouRes);
