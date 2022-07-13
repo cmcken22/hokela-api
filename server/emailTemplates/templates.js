@@ -9,6 +9,18 @@ const templates = {
     const html = formatString(data, { ...variables });
     return html;
   },
+  sendApplicationToOrg: (variables = {}) => {
+    const filePath = path.resolve(__dirname, './applicationToOrg.html');
+    const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
+    const html = formatString(data, { ...variables });
+    return html;
+  },
+  sendApplicationToHokela: (variables = {}) => {
+    const filePath = path.resolve(__dirname, './applicationToHokela.html');
+    const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });
+    const html = formatString(data, { ...variables });
+    return html;
+  },
   followUp: (variables = {}) => {
     const filePath = path.resolve(__dirname, './followUp.html');
     const data = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' });

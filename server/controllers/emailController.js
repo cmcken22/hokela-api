@@ -21,7 +21,7 @@ const sendContactUsEmail = (data = {}) => {
     .catch(err => {
       console.log('CONTACT US EMAIL ERR:', email);
       console.log('err:', err);
-      return resolve(err);
+      return resolve(false);
     });
   })
 }
@@ -45,7 +45,7 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
     .catch(err => {
       console.log('THANK YOU EMAIL ERR:', email);
       console.log('err:', err);
-      return resolve(err);
+      return resolve(false);
     });
   })
 }
@@ -84,7 +84,55 @@ const sendUserApplicationResult = (data = {}) => {
       })
     };
 
-    // console.log('thankYouMsg:', thankYouMsg);
+    sgMail.send(thankYouMsg).then((res) => {
+      console.log('THANK YOU EMAIL SENT:', email);
+      console.log('res:', res);
+      return resolve(true);
+    })
+    .catch(err => {
+      console.log('THANK YOU EMAIL ERR:', email);
+      console.log('err:', err);
+      return resolve(false);
+    });
+  });
+}
+
+const sendApplicationToOrg = (data = {}) => {
+  return new Promise((resolve) => {
+    const {
+      cause_id,
+      contact_name,
+      contact_email,
+      first_name,
+      last_name,
+      email,
+      phone,
+      age_group,
+      location,
+      position,
+      organization,
+      additional_info
+    } = data;
+
+    const thankYouMsg = {
+      to: contact_email,
+      from: 'info@hokela.ca',
+      subject: 'Application Received!',
+      text: 'TEST!!!',
+      html: templates.sendApplicationToOrg({
+        cause_id,
+        contact_name,
+        first_name,
+        last_name,
+        email,
+        phone,
+        age_group,
+        location,
+        position,
+        organization,
+        additional_info: !!additional_info ? additional_info : 'N/A'
+      })
+    };
 
     sgMail.send(thankYouMsg).then((res) => {
       console.log('THANK YOU EMAIL SENT:', email);
@@ -94,27 +142,81 @@ const sendUserApplicationResult = (data = {}) => {
     .catch(err => {
       console.log('THANK YOU EMAIL ERR:', email);
       console.log('err:', err);
-      return resolve(err);
+      return resolve(false);
     });
-  })
+  });
+}
+
+const sendApplicationToHokela = (data = {}) => {
+  return new Promise((resolve) => {
+    const {
+      cause_id,
+      contact_name,
+      contact_email,
+      contact_phone,
+      first_name,
+      last_name,
+      email,
+      phone,
+      age_group,
+      location,
+      position,
+      organization,
+      application_count,
+      additional_info
+    } = data;
+
+    const thankYouMsg = {
+      to: 'mathieu.mackay@hokela.ca',
+      from: 'info@hokela.ca',
+      subject: 'User Application Received!',
+      text: 'TEST!!!',
+      html: templates.sendApplicationToHokela({
+        cause_id,
+        contact_name,
+        contact_email,
+        contact_phone,
+        first_name,
+        last_name,
+        email,
+        phone,
+        age_group,
+        location,
+        position,
+        organization,
+        application_count,
+        additional_info: !!additional_info ? additional_info : 'N/A'
+      })
+    };
+
+    sgMail.send(thankYouMsg).then((res) => {
+      console.log('THANK YOU EMAIL SENT:', email);
+      console.log('res:', res);
+      return resolve(true);
+    })
+    .catch(err => {
+      console.log('THANK YOU EMAIL ERR:', email);
+      console.log('err:', err);
+      return resolve(false);
+    });
+  });
 }
 
 const emailController = {
   sendEmail: (type, data = {}) => {
     return new Promise(async (resolve) => {
-      console.log('\ndata:', data);
+      console.log('\nemailController data:', data);
 
       if (type === 'contact-us') {
         const emailRes = await sendContactUsEmail(data);
-        if (emailRes !== true) return resolve(emailRes);
         const thankYouRes = await sendThankYouForContactingUsEmail(data);
-        console.log('thankYouRes:', thankYouRes);
-        return resolve(thankYouRes);
+        return resolve(emailRes && thankYouRes);
       }
-      if (type === 'user-application-results') {
-        const thankYouRes = await sendUserApplicationResult(data);
-        console.log('thankYouRes:', thankYouRes);
-        return resolve(thankYouRes);
+      if (type === 'user-application') {
+        const userApplicationResult = await sendUserApplicationResult(data);
+        const applicationToOrg = await sendApplicationToOrg(data);
+        const applicationToHokela = await sendApplicationToHokela(data);
+        return resolve(userApplicationResult && applicationToOrg && applicationToHokela);
       }
 
       console.log('email type does not exist:', type);

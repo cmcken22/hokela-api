@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      @font-face {
+        font-family: "Lato";
+        /* src: url("https://storage.googleapis.com/hokela-bucket/fonts/Lato-Regular.ttf") format("truetype"); */
+        src: url("https://storage.googleapis.com/hokela-bucket/icons/Lato-Regular.ttf") format("truetype");
+      }
+      body {
+        padding: 0px;
+        margin: 0px;
+      }
+      .banner {
+        /* height: 83px; */
+        /* width: 100%; */
+        border-bottom: 1px solid #ff6161;
+        margin: 0px 25px;
+        display: flex;
+        align-items: center;
+      }
+      .hokela-icon {
+        height: 53px;
+        width: 90px;
+        margin: 30px auto;
+      }
+      .hokela-icon img {
+        height: 100%;
+        width: 90px;
+        object-fit: contain;
+      }
+      .main-title {
+        /* font-family: "Lato"; */
+        font-family: "Lato";
+        /* src: url("https://storage.googleapis.com/hokela-bucket/fonts/Lato-Regular.ttf") format("truetype"); */
+        /* src: url("https://storage.googleapis.com/hokela-bucket/icons/Lato-Regular.ttf") format("truetype"); */
+
+        color: white;
+        font-size: 36px;
+        text-align: left;
+        max-width: 260px;
+        margin-top: 16px;
+        line-height: 1.36;
+        letter-spacing: 0.81px;
+        margin-bottom: 0px;
+        height: 98px;
+      }
+      .banner-image {
+        height: 90%;
+        width: 30%;
+        background-image: url(https://storage.googleapis.com/hokela-bucket/icons/email-banner-icon-1.svg);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .content {
+        width: 100%;
+        padding: 25px 30px 38px 25px;
+        /* background: white; */
+        box-sizing: border-box;
+      }
+      .text {
+        font-family: tahoma,sans-serif;
+        color: #2f2e2c;
+        font-size: 16px;
+        line-height: 1.44;
+        letter-spacing: 0.2px;
+      }
+      .text--centered {
+        text-align: center;
+        color: white;
+      }
+      .link {
+        color: #15c;
+        font-family: helvetica,sans-serif;
+        font-size: 16px;
+        text-decoration: none;
+      }
+      .link--underline {
+        text-decoration: underline;
+      }
+      .link--white {
+        color: white;
+      }
+      .connect {
+        margin-top: 30px;
+        text-align: center;
+      }
+      .connect p {
+        margin: 0px;
+      }
+      .connect__icons {
+        height: 20px;
+        /* width: 100%; */
+        /* background: red; */
+        margin-top: 14px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .connect__icon {
+        height: 20px;
+        width: 20px;
+        margin-right: 16px;
+        cursor: pointer;
+      }
+      .connect__icon img {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+      }
+      .footer {
+        background: #09203f !important;
+        /* height: 20px; */
+        width: 100%;
+        box-sizing: border-box;
+        padding: 20px 25px 55px 25px;
+      }
+      .footer__logo {
+        height: 46px;
+        width: 49px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+      }
+      .footer__logo img {
+        height: 100%;
+        width: 48px;
+        object-fit: contain; 
+      }
+      .hokela-button {
+        font-family: tahoma,sans-serif;
+        color: white;
+        background: #ff6161;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin: 0 auto;
+        display: block;
+        margin-top: 30px;
+        cursor: pointer;
+        max-width: 180px;
+        text-align: center;
+        text-decoration: none;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: auto;
+        margin-bottom: 20px;
+      }
+      tr {
+        border: 1px solid #c3c0be;
+        height: 35px;
+      }
+      td {
+        font-family: tahoma,sans-serif;
+        color: #2f2e2c;
+        font-size: 16px;
+        line-height: 1.44;
+        letter-spacing: 0.2px;
+      }
+      .cell-main {
+        padding: 8px 10px;
+        border-right: 1px solid #c3c0be;
+        background: #eff0f3;
+      }
+      .cell-main--no-wrap {
+        white-space: nowrap;
+      }
+      .cell-secondary {
+        padding: 8px 10px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body style="width: 100%; background: white !important;">
+    <div style="width: 100%;">
+      <div style="width: 100%; margin: 0 auto;">
+        <div class="banner">
+          <div
+            class="hokela-icon"
+            style="margin: 30px auto !important;"
+          >
+            <img
+              src="https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_logo_original.png"
+              alt="Hokela Logo"
+            />
+          </div>
+        </div>
+        <div class="content">
+          <p class="text">
+            Hello,
+          </p>
+ 
+          <p class="text">
+            A user has applied to the 
+            <a
+              href="https://www.hokela.org/causes/61b12e9415ea3d001e3863d9" 
+            >{position}</a>
+            position at <strong>{organization}</strong>.
+          </p>
+
+          <p class="text">
+            Candidate Info:
+          </p>
+          <table>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                First Name
+              </td>
+              <td class="cell-secondary">{first_name}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Last Name
+              </td>
+              <td class="cell-secondary">{last_name}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Email
+              </td>
+              <td class="cell-secondary">{email}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Phone
+              </td>
+              <td class="cell-secondary">{phone}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Age Group
+              </td>
+              <td class="cell-secondary">{age_group}</td>
+            </tr>
+            <tr>
+              <td class="cell-main">
+                Preferred volunteering location
+              </td>
+              <td class="cell-secondary">{location}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Additional information
+              </td>
+              <td class="cell-secondary">{additional_info}</td>
+            </tr>
+          </table>
+
+          <p class="text">
+            Cause Contact Info:
+          </p>
+          <table>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Name
+              </td>
+              <td class="cell-secondary">{contact_name}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Email
+              </td>
+              <td class="cell-secondary">{contact_email}</td>
+            </tr>
+            <tr>
+              <td class="cell-main cell-main--no-wrap">
+                Phone
+              </td>
+              <td class="cell-secondary">{contact_phone}</td>
+            </tr>
+          </table>
+    
+          <p class="text">
+            <strong>
+              Total applications in DB: {application_count}
+            </strong>
+          </p>
+
+          <p class="text">
+            Have a wonderful day!
+          </p>
+          <!-- <br/>  -->
+          <p class="text">
+            The Hokela Team
+          </p>
+
+          <div class="connect">
+            <p class="text"><strong>Let's connect!</strong></p>
+            <div class="connect__icons">
+              <a
+                class="connect__icon"
+                href="https://www.facebook.com/hokela.ca"
+              >
+                <img src="https://storage.googleapis.com/hokela-bucket/icons/Facebook.png" alt="Facebook Icon" />
+              </a>
+              <a
+                class="connect__icon"
+                href="https://www.instagram.com/hokela.ca"
+              >
+                <img src="https://storage.googleapis.com/hokela-bucket/icons/Instagram.png" alt="Instagram Icon" />
+              </a>
+              <a 
+                class="connect__icon"
+                style="margin-right: 0px;"
+                href="https://www.linkedin.com/company/hokela"
+              >
+                <img src="https://storage.googleapis.com/hokela-bucket/icons/LinkedIn.png" alt="LinkedIn Icon" />
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="footer"
+          style="background: #09203f !important;"
+        >
+          <div class="footer__logo">
+            <img
+              src="https://storage.googleapis.com/hokela-bucket/companies/hokela%20technologies/logos/hokela_logo_original.png"
+              alt="Hokela Logo"
+            />
+          </div>
+          <p class="text text--centered">
+            <i>Copyright © 2022 Hokela Technologies. All rights reserved.</i>
+            <br/>
+            Do not reply to this email.
+            <br/>
+            For further questions, contact us at <a href="mailto:info@hokela.ca" class="link link--underline link--white">info@hokela.ca</a>.
+            <br/>
+            Click <a href="https://www.hokela.org/terms" target="_blank" class="link link--underline link--white">here</a> to view our Terms of Use.
+            <br/>
+            <br/>
+            Toronto, ON, Canada.
+          </p>
+          <a
+            class="hokela-button"
+            href="https://www.hokela.org"
+            style="color: white !important; background-color: #ff6161 !important;"
+          >
+            Go to Hokela
+          </a>
+        </div>
+      </div>
+    </div>
+    <script>
+      function openLink(link) {
+        window.open(link, "_blank");
+      }
+    </script>
+  </body>
+</html>

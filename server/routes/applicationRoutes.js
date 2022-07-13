@@ -66,9 +66,7 @@ const routes = function () {
     
     console.log('\n-------------------');
     console.log('cause_id:', cause_id);
-    console.log('cause:', cause);
     console.log('location_id:', location_id);
-    console.log('location:', location);
     console.log('user:', user);
     console.log('-------------------\n');
 
@@ -80,15 +78,11 @@ const routes = function () {
       ...user
     });
 
-    
     newApplication.save(async (err, application) => {
       if (err) {
         console.log('err:', err);
         return res.status(500).send({ message: "Erorr Applying to Cause", err });
       } else {
-        // const { name, contact, organization } = cause;
-        // const { first_name, email } = newApplication;
-
         const emailInfo = {
           cause_id,
           first_name: user.first_name,
@@ -96,72 +90,17 @@ const routes = function () {
           location: formatLocation(location),
           position: cause.name,
           organization: cause.organization,
+          contact_name: cause.contact.name,
+          contact_email: cause.contact.email,
+          contact_phone: cause.contact.phone,
+          application_count: await ApplicationModel.count(),
           ...user,
         };
-
+    
         console.log('emailInfo:', emailInfo);
-
-        EmailController.sendEmail('user-application-results', emailInfo);
-
-        // commented out for testing purposes
-        // if (contact && contact.email) {
-        //   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        //   const valid = re.test(String(contact.email).toLowerCase());
-        //   if (valid) {
-        //     const followUpEmail = {
-        //       to: contact.email,
-        //       from: 'info@hokela.ca',
-        //       subject: 'Hokela Info!',
-        //       text: 'TEST!!!',
-        //       html: templates.followUp({
-        //         causeName: name,
-        //         contactEmail: contact.email,
-        //         organization,
-        //         location: location.city.toLowerCase() === 'remote' ? `${location.city}` : `${location.city}, ${location.province}, ${location.country}`,
-        //         ...user,
-        //       })
-        //     }
-        //     sgMail.send(followUpEmail)
-        //       .then(() => {
-        //         console.log(`FOLLOW UP EMAIL SENT:`, contact.email);
-        //       })
-        //       .catch(err => {
-        //         console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
-        //         console.log('err:', err);
-        //       });
-        //     } else {
-        //       const err = `Invalid Email: ${contact.email}`;
-        //       console.log(`FOLLOW UP EMAIL ERR:`, contact.email);
-        //       console.log('err:', err);
-        //   }
-        // }
-        // commented out for testing purposes
-
-        // let users = ['conner.mckenna94@gmail.com', 'mathieu.mackay@hokela.ca'];
-        // if (created_by && created_by.email) {
-        //   users.push(created_by.email)
-        // }
-
-        // for (let i = 0; i < users.length; i++) {
-        //   const user = users[i];
-        //   console.log('user:', user);
-        //   console.log('sending follow up email to:', user);
-        //   const msg1 = {
-        //     to: user, // Change to your recipient
-        //     from: 'conner.mckenna@hokela.ca', // Change to your verified sender
-        //     subject: 'Hokela Info!',
-        //     text: 'TEST!!!',
-        //     html: `<p>User with email <strong>${email}</strong> has just applied to cause <strong>${name}</strong>!</p>`,
-        //   }
-        //   sgMail.send(msg1)
-        //     .then(() => {
-        //       console.log(`EMAIL SENT${i}:`, user);
-        //     })
-        //     .catch(err => {
-        //       console.log(`EMAIL ERR${i}:`, user);
-        //     })
-        // }
-
+    
+        const emailRes = await EmailController.sendEmail('user-application', emailInfo);
+        console.log('emailRes:', emailRes);
         return res.status(200).send(application);
       }
     });
