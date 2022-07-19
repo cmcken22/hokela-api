@@ -23,6 +23,9 @@ const routes = function () {
 
     const locations = await LocationModel.find({ cause_id });
 
+    // TODO: remove
+    return res.status(404).send({ message: 'No Application exists in the DB' });
+
     ApplicationModel
       .find({ cause_id, email })
       .then((docs) => {
@@ -77,6 +80,27 @@ const routes = function () {
       last_name: user.last_name,
       ...user
     });
+
+    const emailInfo = {
+      cause_id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      location: formatLocation(location),
+      position: cause.name,
+      organization: cause.organization,
+      contact_name: cause.contact.name,
+      contact_email: cause.contact.email,
+      contact_phone: cause.contact.phone,
+      application_count: await ApplicationModel.count(),
+      ...user,
+    };
+
+    console.log('emailInfo:', emailInfo);
+
+    const emailRes = await EmailController.sendEmail('user-application', emailInfo);
+    console.log('emailRes:', emailRes);
+
+    return res.status(200).send(newApplication);
 
     newApplication.save(async (err, application) => {
       if (err) {

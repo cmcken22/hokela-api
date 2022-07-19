@@ -9,6 +9,9 @@ async function alreadyApplied(req, res, next) {
     },
   } = req;
 
+  // TODO: remove
+  return next();
+
   const application = await ApplicationModel.find({ email, cause_id, location_id });
   if (application && application.length) {
     return res.status(500).send({

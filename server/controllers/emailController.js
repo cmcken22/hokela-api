@@ -214,8 +214,10 @@ const emailController = {
       }
       if (type === 'user-application') {
         const userApplicationResult = await sendUserApplicationResult(data);
-        const applicationToOrg = await sendApplicationToOrg(data);
-        const applicationToHokela = await sendApplicationToHokela(data);
+        // TODO: remove
+        return resolve(userApplicationResult);
+        // const applicationToOrg = await sendApplicationToOrg(data);
+        // const applicationToHokela = await sendApplicationToHokela(data);
         return resolve(userApplicationResult && applicationToOrg && applicationToHokela);
       }
 
