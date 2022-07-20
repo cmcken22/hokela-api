@@ -2,15 +2,19 @@
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const { templates } = require('../emailTemplates/templates');
-const ToggleModel = require('../models/toggleModel');
 const { getToggleState, getEmailRecipient } = require('../util/helpers');
+
+const FROM_EMAIL_INFO = {
+  email: 'info@hokela.ca',
+  name: 'Hokela Info'
+}
 
 const sendContactUsEmail = (data = {}) => {
   return new Promise((resolve) => {
     const { name, email, message } = data;
     const thankYouMsg = {
       to: 'info@hokela.ca',
-      from: 'info@hokela.ca',
+      from: FROM_EMAIL_INFO,
       subject: `User email received! (${email})`,
       text: 'TEST!!!',
       html: templates.contactUs({ first_name: name, email, message })
@@ -33,7 +37,7 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
     const { name, email, message } = data;
     const thankYouMsg = {
       to: email,
-      from: 'info@hokela.ca',
+      from: FROM_EMAIL_INFO,
       subject: 'Thanks for Contacting Us!',
       text: 'TEST!!!',
       html: templates.thankYouForContactingUs({ first_name: name, message })
@@ -71,7 +75,7 @@ const sendUserApplicationResult = (data = {}) => {
 
     const thankYouMsg = {
       to: recipient,
-      from: 'info@hokela.ca',
+      from: FROM_EMAIL_INFO,
       subject: 'Thanks for Your Application!',
       text: 'TEST!!!',
       html: templates.userApplicationResult({
@@ -122,7 +126,7 @@ const sendApplicationToOrg = (data = {}) => {
 
     const thankYouMsg = {
       to: recipient,
-      from: 'info@hokela.ca',
+      from: FROM_EMAIL_INFO,
       subject: 'Application Received!',
       text: 'TEST!!!',
       html: templates.sendApplicationToOrg({
@@ -176,7 +180,7 @@ const sendApplicationToHokela = (data = {}) => {
 
     const thankYouMsg = {
       to: recipient,
-      from: 'info@hokela.ca',
+      from: FROM_EMAIL_INFO,
       subject: 'User Application Received!',
       text: 'TEST!!!',
       html: templates.sendApplicationToHokela({
