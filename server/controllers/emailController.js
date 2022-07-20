@@ -2,6 +2,8 @@
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const { templates } = require('../emailTemplates/templates');
+const ToggleModel = require('../models/toggleModel');
+const { getToggleState, getEmailRecipient } = require('../util/helpers');
 
 const sendContactUsEmail = (data = {}) => {
   return new Promise((resolve) => {
@@ -51,7 +53,7 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
 }
 
 const sendUserApplicationResult = (data = {}) => {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const {
       cause_id,
       first_name,
@@ -65,8 +67,10 @@ const sendUserApplicationResult = (data = {}) => {
       additional_info
     } = data;
 
+    const recipient = await getEmailRecipient(email);
+
     const thankYouMsg = {
-      to: email,
+      to: recipient,
       from: 'info@hokela.ca',
       subject: 'Thanks for Your Application!',
       text: 'TEST!!!',
@@ -98,7 +102,7 @@ const sendUserApplicationResult = (data = {}) => {
 }
 
 const sendApplicationToOrg = (data = {}) => {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const {
       cause_id,
       contact_name,
@@ -114,8 +118,10 @@ const sendApplicationToOrg = (data = {}) => {
       additional_info
     } = data;
 
+    const recipient = await getEmailRecipient(contact_email);
+
     const thankYouMsg = {
-      to: contact_email,
+      to: recipient,
       from: 'info@hokela.ca',
       subject: 'Application Received!',
       text: 'TEST!!!',
@@ -148,7 +154,7 @@ const sendApplicationToOrg = (data = {}) => {
 }
 
 const sendApplicationToHokela = (data = {}) => {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const {
       cause_id,
       contact_name,
@@ -166,8 +172,10 @@ const sendApplicationToHokela = (data = {}) => {
       additional_info
     } = data;
 
+    const recipient = await getEmailRecipient('mathieu.mackay@hokela.ca');
+
     const thankYouMsg = {
-      to: 'mathieu.mackay@hokela.ca',
+      to: recipient,
       from: 'info@hokela.ca',
       subject: 'User Application Received!',
       text: 'TEST!!!',
@@ -213,11 +221,10 @@ const emailController = {
         return resolve(emailRes && thankYouRes);
       }
       if (type === 'user-application') {
+        const sendOrgEmail = await getToggleState('send_email_to_org');
         const userApplicationResult = await sendUserApplicationResult(data);
-        // TODO: remove
-        return resolve(userApplicationResult);
-        // const applicationToOrg = await sendApplicationToOrg(data);
-        // const applicationToHokela = await sendApplicationToHokela(data);
+        const applicationToOrg = sendOrgEmail ? await sendApplicationToOrg(data) : true;
+        const applicationToHokela = await sendApplicationToHokela(data);
         return resolve(userApplicationResult && applicationToOrg && applicationToHokela);
       }
 

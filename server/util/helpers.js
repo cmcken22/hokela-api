@@ -1,5 +1,23 @@
 const { logObject } = require('../util/log.helper');
 const CauseModel = require('../models/causeModel');
+const ToggleModel = require('../models/toggleModel');
+
+const getToggleState = (name = "") => {
+  return new Promise(async (resolve, reject) => {
+    if (!name) return reject('no name supplied');
+    const toggle = await ToggleModel.findOne({ name });
+    if (toggle) return resolve(toggle.state === 'FeatureOn');
+    return reject();
+  });
+}
+
+const getEmailRecipient = (email = "") => {
+  return new Promise(async (resolve, reject) => {
+    const sendAllEmailsToConner = await getToggleState('send_all_emails_to_conner');
+    if (sendAllEmailsToConner) return resolve('conner.mckenna94@gmail.com');
+    return resolve(email);
+  });
+}
 
 const formatMultiSearchQuery = (key, value) => {
   const values = value.split(',');
@@ -389,5 +407,7 @@ module.exports = {
   buildFacet,
   buildAggregateQuery,
   buildAggregateQueryForArray,
-  aggregateCausesWithLocations
+  aggregateCausesWithLocations,
+  getToggleState,
+  getEmailRecipient
 };

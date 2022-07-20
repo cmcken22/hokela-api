@@ -1,4 +1,5 @@
 const ApplicationModel = require('../models/applicationModel');
+const { getToggleState } = require('../util/helpers');
 
 async function alreadyApplied(req, res, next) {
   const {
@@ -9,8 +10,8 @@ async function alreadyApplied(req, res, next) {
     },
   } = req;
 
-  // TODO: remove
-  return next();
+  const preventAlreadyAppliedCheck = await getToggleState('prevent_already_applied_check');
+  if (preventAlreadyAppliedCheck) return next();
 
   const application = await ApplicationModel.find({ email, cause_id, location_id });
   if (application && application.length) {

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { buildQuery } = require('../util/helpers');
+const { buildQuery, getToggleState } = require('../util/helpers');
 const { templates } = require('../emailTemplates/templates');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const validations = require('../middlewares/validations');
+const { verifyApiKey } = require('../middlewares/auth');
 
 const ApplicationModel = require('../models/applicationModel');
 const LocationModel = require('../models/locationModel');
@@ -23,8 +24,8 @@ const routes = function () {
 
     const locations = await LocationModel.find({ cause_id });
 
-    // TODO: remove
-    return res.status(404).send({ message: 'No Application exists in the DB' });
+    const preventAlreadyAppliedCheck = await getToggleState('prevent_already_applied_check');
+    if (preventAlreadyAppliedCheck) return res.status(404).send({ message: 'No Application exists in the DB' });
 
     ApplicationModel
       .find({ cause_id, email })
@@ -81,27 +82,6 @@ const routes = function () {
       ...user
     });
 
-    const emailInfo = {
-      cause_id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      location: formatLocation(location),
-      position: cause.name,
-      organization: cause.organization,
-      contact_name: cause.contact.name,
-      contact_email: cause.contact.email,
-      contact_phone: cause.contact.phone,
-      application_count: await ApplicationModel.count(),
-      ...user,
-    };
-
-    console.log('emailInfo:', emailInfo);
-
-    const emailRes = await EmailController.sendEmail('user-application', emailInfo);
-    console.log('emailRes:', emailRes);
-
-    return res.status(200).send(newApplication);
-
     newApplication.save(async (err, application) => {
       if (err) {
         console.log('err:', err);
@@ -134,8 +114,11 @@ const routes = function () {
     
   });
 
-  router.delete('/', (req, res) => {
-    
+  router.delete('/', verifyApiKey, (req, res) => {
+    ApplicationModel.remove({}, (err, result) => {
+      if (err) return res.status(200).send({ err });
+      return res.status(200).send({ result });
+    });
   });
 
   return router;

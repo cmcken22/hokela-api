@@ -6,6 +6,12 @@ async function verifyAccessToken(req, res, next) {
 
 }
 
+async function verifyApiKey(req, res, next) {
+  if (req.headers && req.headers.api_key == process.env.API_KEY) return next();
+  return res.status(401).send('Unauthorized');
+}
+
+
 function getUserInfo(req, res, next) {
   const { authorization } = req.headers;
   const [, accessToken] = authorization.split('Bearer ');
@@ -35,5 +41,6 @@ function validateAdmin(req, res, next) {
 module.exports = {
   verifyAccessToken,
   validateAdmin,
-  getUserInfo
+  getUserInfo,
+  verifyApiKey
 }

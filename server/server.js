@@ -21,6 +21,7 @@ const locationRoutes = require('./routes/locationRoutes.js');
 const volunteerRoutes = require('./routes/volunteerRoutes.js');
 const applicationRoutes = require('./routes/applicationRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
+const toggleRoutes = require('./routes/toggleRoutes');
 
 /* to avoid mongoose deprecation warnings */
 mongoose.set('useNewUrlParser', true);
@@ -52,6 +53,7 @@ app.use('/cause-api/v1/locations', locationRoutes());
 app.use('/cause-api/v1/volunteer', volunteerRoutes());
 app.use('/cause-api/v1/apply', applicationRoutes());
 app.use('/cause-api/v1/auth', authRoutes());
+app.use('/cause-api/v1/toggles', toggleRoutes());
 
 /* connect to database and listen to port only if the connection is succesful */
 const options = {
