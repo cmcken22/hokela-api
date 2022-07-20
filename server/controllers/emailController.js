@@ -180,7 +180,10 @@ const sendApplicationToHokela = (data = {}) => {
 
     const thankYouMsg = {
       to: recipient,
-      from: FROM_EMAIL_INFO,
+      from: {
+        ...FROM_EMAIL_INFO,
+        name: '[System] Hokela Info'
+      },
       subject: 'User Application Received!',
       text: 'TEST!!!',
       html: templates.sendApplicationToHokela({
