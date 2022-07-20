@@ -36,11 +36,35 @@ const routes = function () {
   router.post('/', verifyApiKey, async (req, res) => {
     const { name, state } = req.body;
 
+    if (!name) {
+      return res.status(500).send({ err: 'name required' });
+    }
+
+    const nameExists = (await ToggleModel.find({ name })).length >= 1;
+    if (nameExists) {
+      return res.status(500).send({ err: 'name already in use' });
+    }
+
+    if (state !== "FeatureOn" && state !== "FeatureOff") {
+      return res.status(500).send({ err: `Illegal state type (${state}).` });
+    }
+
+    let query = {};
+    if (!!state) {
+      if (state !== "FeatureOn" && state !== "FeatureOff") {
+        return res.status(500).send({ err: `Illegal state type (${state}).` });
+      }
+      query = {
+        ...query,
+        state
+      };
+    }    
+
     const newToggle = new ToggleModel({
       name,
       state
     });
-    
+
     newToggle.save(async (err, toggle) => {
       if (err) {
         console.log('err:', err);
@@ -56,7 +80,7 @@ const routes = function () {
     const { body: { name, state } } = req;
 
     if (!!name) {
-      return res.status(500).send({ err: `Cannot edit name!` });
+      return res.status(500).send({ err: 'Cannot edit name!' });
     }
 
     let query = {};
