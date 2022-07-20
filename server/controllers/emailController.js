@@ -226,9 +226,10 @@ const emailController = {
       }
       if (type === 'user-application') {
         const sendOrgEmail = await getToggleState('send_email_to_org');
+        const sendHokelaEmail = await getToggleState('send_email_to_hokela');
         const userApplicationResult = await sendUserApplicationResult(data);
         const applicationToOrg = sendOrgEmail ? await sendApplicationToOrg(data) : true;
-        const applicationToHokela = await sendApplicationToHokela(data);
+        const applicationToHokela = sendHokelaEmail ? await sendApplicationToHokela(data) : true;
         return resolve(userApplicationResult && applicationToOrg && applicationToHokela);
       }
 
