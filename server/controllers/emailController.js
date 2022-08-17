@@ -76,7 +76,7 @@ const sendUserApplicationResult = (data = {}) => {
     const thankYouMsg = {
       to: recipient,
       from: FROM_EMAIL_INFO,
-      subject: 'Thanks for Your Application!',
+      subject: 'Thank you for your application!',
       text: 'TEST!!!',
       html: templates.userApplicationResult({
         cause_id,
