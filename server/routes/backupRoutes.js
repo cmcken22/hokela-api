@@ -129,7 +129,7 @@ const routes = function () {
   router.patch('/set', verifyApiKey, async (req, res) => {
     const { date } = req.body;
     const files = await bucket.getFiles({ prefix: `${date}/` });
-    if (!files?.[0]?.length) {
+    if (!files[0].length) {
       return res.status(400).send(`No back up found for: ${date}`);
     }
 
