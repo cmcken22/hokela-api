@@ -55,7 +55,7 @@ app.use('/cause-api/v1/volunteer', volunteerRoutes());
 app.use('/cause-api/v1/apply', applicationRoutes());
 app.use('/cause-api/v1/auth', authRoutes());
 app.use('/cause-api/v1/toggles', toggleRoutes());
-app.use('/cause-api/v1/backup', backupRoutes());
+app.use('/cause-api/v1/backups', backupRoutes());
 
 /* connect to database and listen to port only if the connection is succesful */
 const options = {

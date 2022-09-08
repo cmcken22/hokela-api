@@ -11,7 +11,6 @@ async function verifyApiKey(req, res, next) {
   return res.status(401).send('Unauthorized');
 }
 
-
 function getUserInfo(req, res, next) {
   const { authorization } = req.headers;
   const [, accessToken] = authorization.split('Bearer ');
@@ -26,6 +25,7 @@ function getUserInfo(req, res, next) {
 }
 
 function validateAdmin(req, res, next) {
+  if (req.headers && req.headers.api_key == process.env.API_KEY) return next();
   const { authorization } = req.headers;
   const [, accessToken] = authorization.split('Bearer ');
   const decoded = jwt.decode(accessToken);
@@ -42,5 +42,5 @@ module.exports = {
   verifyAccessToken,
   validateAdmin,
   getUserInfo,
-  verifyApiKey
+  verifyApiKey,
 }
