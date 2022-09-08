@@ -119,6 +119,9 @@ const getBackups = () => {
   });
 }
 
+const MIN_BACKUPS = 2;
+const MAX_BACKUPS = 10;
+
 const routes = function () {
   router.get('/', validateAdmin, async (req, res) => {
     try {
@@ -131,6 +134,11 @@ const routes = function () {
 
   router.post('/', validateAdmin, async (req, res) => {
     try {
+      const backups = await getBackups();
+      if (backups && backups.length >= MAX_BACKUPS) {
+        return res.status(500).send(`Too many backups. Please delete some first`);
+      }
+
       const folderName = getTodaysDateAndTime();
       const promises = [];
       for (let i = 0; i < entityMap.length; i++) {
@@ -194,16 +202,14 @@ const routes = function () {
 
   router.delete('/:date', validateAdmin, async (req, res) => {
     try {
-      const MIN_BACKUPS_REQUIRED = 2;
       const { date } = req.params;
-  
       const files = await bucket.getFiles({ prefix: `${date}/` });
       if (!files[0].length) {
         return res.status(400).send(`No back up found for: ${date}`);
       }
   
       const backups = await getBackups();
-      if (!backups || backups.length <= MIN_BACKUPS_REQUIRED) {
+      if (!backups || backups.length <= MIN_BACKUPS) {
         return res.status(500).send(`We don't have enough backups stored.. lets keep a few`);
       }
   
