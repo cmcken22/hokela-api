@@ -2,7 +2,7 @@ FROM node:9.4.0-alpine
 ENV PORT 4000
 
 WORKDIR /usr/src/app
-COPY /backups /usr/src/app
+COPY /backups /usr/src/app/backups
 COPY package*.json ./
 RUN npm install
 
