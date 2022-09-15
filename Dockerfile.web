@@ -1,7 +1,7 @@
 FROM node:9.4.0-alpine
 
 WORKDIR /usr/src/app
-COPY /backups /usr/src/app/backups
+# COPY /backups /usr/src/app/backups
 COPY package*.json ./
 RUN npm install
 
