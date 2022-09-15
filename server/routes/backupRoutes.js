@@ -35,8 +35,9 @@ const getFormattedTime = (date = new Date()) => {
 }
 
 const getTodaysDateAndTime = () => {
-  const date = new Date();
-  return `${pad(date.getMonth() + 1)}_${pad(date.getDate())}_${date.getFullYear()}@${getFormattedTime()}`;
+  // const date = new Date();
+  // return `${pad(date.getMonth() + 1)}_${pad(date.getDate())}_${date.getFullYear()}@${getFormattedTime()}`;
+  return new Date().toISOString();
 }
 
 const storage = new Storage({
