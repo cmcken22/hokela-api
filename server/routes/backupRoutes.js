@@ -11,7 +11,11 @@ const LocationModel = require('../models/locationModel');
 const ToggleModel = require('../models/toggleModel');
 
 const deleteFile = (fileName) => {
-  fs.unlinkSync(fileName);
+  fs.readFile(fileName, (err) => {
+    if (!err) {
+      fs.unlinkSync(fileName);
+    }
+  });
 }
 
 const pad = (num) => {
@@ -74,12 +78,12 @@ const uploadFile = (data, collectionName, folderName) => {
           deleteFile(tempFileName);
           return resolve({ collectionName, status: true });
         }).catch((error) => {
-          console.log('FILE UPLOAD FAILED1:', tempFileName);
+          console.log('FILE UPLOAD FAILED1:', error);
           deleteFile(tempFileName);
           return resolve({ collectionName, status: error });
         });
       } else {
-        console.log('FILE UPLOAD FAILED2:', tempFileName);
+        console.log('FILE UPLOAD FAILED2:', err);
         deleteFile(tempFileName);
         return resolve({ collectionName, status: err });
       }
