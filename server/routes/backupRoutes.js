@@ -69,7 +69,13 @@ const uploadFile = (data, collectionName, folderName) => {
     const tempFileName = `${tempFilePath}/${collectionName}.json`;
     const destFileName = `/${folderName}/${collectionName}.json`;
 
-    fs.writeFile(tempFileName, JSON.stringify(data, undefined, 2), (err) => {
+    if (fs.existsSync(tempFilePath)) {
+      console.log('folder exists!');
+    } else {
+      console.log('folder DOES NOT exist!');
+    }
+
+    fs.writeFile(tempFileName, JSON.stringify(data), (err) => {
       if (!err) {
         bucket.upload(tempFileName, {
           destination: destFileName
