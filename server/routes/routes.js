@@ -433,39 +433,17 @@ const routes = function() {
   });
 
   router.delete("/:id", validateAdmin, getUserInfo, async (req, res) => {
-    CauseModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        stauts: "ARCHIVED",
-        updated_by: req.user,
-        last_modified_date: Date.now(),
-      },
-      async (err, cause) => {
-        if (err) {
-          return res.status(500).send({ message: err });
-        } else if (cause === null) {
-          return res
-            .status(404)
-            .send({ message: "Cause id does not exist in mongo db" });
-        }
-        console.log("\nNEW CAUSE");
-        console.log("cause._doc:", cause._doc);
-        return res
-          .status(200)
-          .send({ message: "Cause successfully archived", id: cause._id });
+    CauseModel.findByIdAndDelete(req.params.id, (err, cause) => {
+      if (err) {
+        res.status(500);
+        res.send(err);
+      } else if (cause === null) {
+        res.status(500);
+        res.send({ message: "Caues id does not exist in mongo db" });
+      } else {
+        res.send({ message: "Cause successfully deleted!", id: cause._id });
       }
-    );
-    // CauseModel.findByIdAndDelete(req.params.id, (err, cause) => {
-    //   if (err) {
-    //     res.status(500);
-    //     res.send(err);
-    //   } else if (cause === null) {
-    //     res.status(500);
-    //     res.send({ message: "Caues id does not exist in mongo db" });
-    //   } else {
-    //     res.send({ message: "Cause successfully deleted!", id: cause._id });
-    //   }
-    // });
+    });
   });
 
   router.delete("/", validateAdmin, (req, res) => {});
