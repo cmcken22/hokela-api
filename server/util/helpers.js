@@ -1,34 +1,36 @@
-const { logObject } = require('../util/log.helper');
-const CauseModel = require('../models/causeModel');
-const ToggleModel = require('../models/toggleModel');
+const { logObject } = require("../util/log.helper");
+const CauseModel = require("../models/causeModel");
+const ToggleModel = require("../models/toggleModel");
 
 const getToggleState = (name = "") => {
   return new Promise(async (resolve, reject) => {
-    if (!name) return reject('no name supplied');
+    if (!name) return reject("no name supplied");
     const toggle = await ToggleModel.findOne({ name });
-    if (toggle) return resolve(toggle.state === 'FeatureOn');
+    if (toggle) return resolve(toggle.state === "FeatureOn");
     return reject();
   });
-}
+};
 
 const getEmailRecipient = (email = "") => {
   return new Promise(async (resolve, reject) => {
-    const sendAllEmailsToConner = await getToggleState('send_all_emails_to_conner');
-    if (sendAllEmailsToConner) return resolve('conner.mckenna94@gmail.com');
+    const sendAllEmailsToConner = await getToggleState(
+      "send_all_emails_to_conner"
+    );
+    if (sendAllEmailsToConner) return resolve("conner.mckenna94@gmail.com");
     return resolve(email);
   });
-}
+};
 
 const formatMultiSearchQuery = (key, value) => {
-  const values = value.split(',');
-  let result = values.map(v => {
+  const values = value.split(",");
+  let result = values.map((v) => {
     return { [key]: { $eq: v } };
   });
-  let query = { 
-    $or: result
+  let query = {
+    $or: result,
   };
   return query;
-}
+};
 
 const buildQuery = (query, mapOverride = {}) => {
   const keys = Object.keys(query);
@@ -36,19 +38,19 @@ const buildQuery = (query, mapOverride = {}) => {
   // console.log('\n-------------');
 
   const validQueryMap = {
-    status: 'status',
-    name: 'name',
-    cause_id: 'cause_id',
-    organization: 'organization',
-    locations: 'locations',
-    sector: 'sector',
-    time_of_day: 'time_of_day',
-    duration: 'duration',
-    skill: 'skill',
-    ages: 'ages',
-    days: 'days',
-    ideal_for: 'ideal_for',
-    ...mapOverride
+    status: "status",
+    name: "name",
+    cause_id: "cause_id",
+    organization: "organization",
+    locations: "locations",
+    sector: "sector",
+    time_of_day: "time_of_day",
+    duration: "duration",
+    skill: "skill",
+    ages: "ages",
+    days: "days",
+    ideal_for: "ideal_for",
+    ...mapOverride,
   };
 
   let queryRes = {};
@@ -57,22 +59,24 @@ const buildQuery = (query, mapOverride = {}) => {
 
     if (validQuery) {
       let value = query[keys[i]];
-      if (typeof value === 'string' && value.indexOf('[') !== -1) {
+      if (typeof value === "string" && value.indexOf("[") !== -1) {
         const array = JSON.parse(value);
         let val = { $or: [] };
         for (let i = 0; i < array.length; i++) {
           const loc = array[i];
-          const [city, province] = loc.split(',');
+          const [city, province] = loc.split(",");
           let obj = {
-            city
+            city,
           };
           if (!!province) {
             obj = {
               ...obj,
-              $and: [{
-                province
-              }]
-            }
+              $and: [
+                {
+                  province,
+                },
+              ],
+            };
           }
           val.$or.push(obj);
         }
@@ -81,115 +85,110 @@ const buildQuery = (query, mapOverride = {}) => {
           ...queryRes,
           ...val,
         };
-      } else if (typeof value === 'string' && value.indexOf(',') !== -1) {
+      } else if (typeof value === "string" && value.indexOf(",") !== -1) {
         value = formatMultiSearchQuery(keys[i], value);
         queryRes = {
           ...queryRes,
-          ...value
+          ...value,
         };
       } else {
         queryRes = {
           ...queryRes,
-          [validQuery]: value
+          [validQuery]: value,
         };
       }
     }
   }
   return queryRes;
-}
+};
 
 const buildUserInfo = (res) => {
   let user = {};
   if (res && res.locals && res.locals.user) {
     user = {
-      ...res.locals.user
+      ...res.locals.user,
     };
   }
   return user;
-}
+};
 
 const buildFacet = (pageSize, pageToken, createdDateSortOrder) => {
   let facet = {};
   if (!pageSize) {
     facet = {
-      metadata: [
-        { $count: "total" },
-        { $addFields: { page: 0 } }
-      ],
+      metadata: [{ $count: "total" }, { $addFields: { page: 0 } }],
       data: [
         { $sort: { created_date: createdDateSortOrder } },
         { $skip: 0 },
-        { $limit: 10000000 }
-      ]
+        { $limit: 10000000 },
+      ],
     };
   } else if (!!pageSize && !pageToken) {
     facet = {
-      metadata: [
-        { $count: "total" },
-        { $addFields: { page: 0 } }
-      ],
+      metadata: [{ $count: "total" }, { $addFields: { page: 0 } }],
       data: [
         { $sort: { created_date: createdDateSortOrder } },
         { $skip: 0 },
-        { $limit: JSON.parse(pageSize) }
-      ]
+        { $limit: JSON.parse(pageSize) },
+      ],
     };
   } else if (!!pageSize && !!pageToken) {
-    const decodedPageToken = pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
+    const decodedPageToken =
+      pageToken !== undefined ? JSON.parse(Base64.decode(pageToken)) : null;
     if (!!pageSize && !!decodedPageToken) {
       if (decodedPageToken.page_size !== pageSize) {
-        return res.status(400).send('Page size does not match!');
+        return res.status(400).send("Page size does not match!");
       }
     }
     facet = {
       metadata: [
         { $count: "total" },
-        { $addFields: { page: decodedPageToken.page_offset } }
+        { $addFields: { page: decodedPageToken.page_offset } },
       ],
       data: [
         { $sort: { created_date: createdDateSortOrder } },
         { $skip: pageSize * decodedPageToken.page_offset },
-        { $limit: JSON.parse(pageSize) }
-      ]
+        { $limit: JSON.parse(pageSize) },
+      ],
     };
   }
 
   return facet;
-}
+};
 
 const buildAggregateQuery = (value, name) => {
-  const splitValues = value.split(',');
+  const splitValues = value.split(",");
   let values = [];
   for (let i = 0; i < splitValues.length; i++) {
     const _value = splitValues[i];
     values.push({
-      $eq: [`$${name}`, _value]
+      $eq: [`$${name}`, _value],
     });
   }
   return values;
-}
+};
 
-const buildAggregateQueryForArray = (options, field, op = 'eq') => {
+const buildAggregateQueryForArray = (options, field, op = "eq") => {
   let filters = [];
   if (!!options) {
     const parsedOptions = JSON.parse(options);
     for (let i = 0; i < parsedOptions.length; i++) {
       const value = parsedOptions[i];
-      if (op === 'eq') {
-        filters.push({ '$eq': [`$${field}`, value] });
-      } else if (op === 'in') {
-        filters.push({ [`${field}`]: { '$in': [value, `$${field}`] }});
+      if (op === "eq") {
+        filters.push({ $eq: [`$${field}`, value] });
+      } else if (op === "in") {
+        filters.push({ [`${field}`]: { $in: [value, `$${field}`] } });
       }
     }
   }
   return filters;
-}
+};
 
 const buildAggregateQueryForArray_old = (options, field) => {
   let filters = null;
   if (!!options) {
     const arr = [];
-    const splitOptions = options.split(',');
+    const splitOptions = options.split(",");
     for (let i = 0; i < splitOptions.length; i++) {
       const value = splitOptions[i];
       arr.push({
@@ -198,12 +197,12 @@ const buildAggregateQueryForArray_old = (options, field) => {
     }
     filters = {
       $match: {
-        $or: [...arr]
-      }
+        $or: [...arr],
+      },
     };
   }
   return filters;
-}
+};
 
 const aggregateCausesWithLocations = (query) => {
   return new Promise(async (resolve) => {
@@ -220,14 +219,25 @@ const aggregateCausesWithLocations = (query) => {
       days,
       ideal_for,
       search,
-      sort_by
-    } = query; 
+      sort_by,
+      status = "ACTIVE",
+    } = query;
 
-    const facet = buildFacet(pageSize, pageToken, sort_by === 'desc' ? 1 : -1);
+    const facet = buildFacet(pageSize, pageToken, sort_by === "desc" ? 1 : -1);
 
-    // TODO: build this array if other queries come in
+    const statusArray = !!status ? status.split(",") : [];
+    const statuses = [];
+    for (let i = 0; i < statusArray.length; i++) {
+      const status = statusArray[i];
+      statuses.push({ $eq: ["$status", status] });
+    }
+
     let causeFilters = [
-      { $expr: { $eq: ["$status", "ACTIVE"] } }
+      {
+        $expr: {
+          $or: [...statuses],
+        },
+      },
     ];
 
     if (!!sector) {
@@ -250,13 +260,18 @@ const aggregateCausesWithLocations = (query) => {
     }
     if (!!ages) {
       const parsedAges = JSON.parse(ages);
-      const allAgesSelected = !!parsedAges.find(x => x && x.toLowerCase() === 'all ages');
+      const allAgesSelected = !!parsedAges.find(
+        (x) => x && x.toLowerCase() === "all ages"
+      );
 
       // if all ages is selected no need to apply a filter
       if (!allAgesSelected) {
         // if youth or adult is selected, All ages applies to them as well
-        parsedAges.push('All ages');
-        const values = buildAggregateQueryForArray(JSON.stringify(parsedAges), "ages");
+        parsedAges.push("All ages");
+        const values = buildAggregateQueryForArray(
+          JSON.stringify(parsedAges),
+          "ages"
+        );
         causeFilters.push({
           $expr: { $or: [...values] },
         });
@@ -271,64 +286,68 @@ const aggregateCausesWithLocations = (query) => {
 
     let dayFilters = null;
     if (!!days) {
-      const values = buildAggregateQueryForArray(days, 'days', 'in');
+      const values = buildAggregateQueryForArray(days, "days", "in");
       dayFilters = {
-        '$match': {
-          '$or': [...values]
-        }
+        $match: {
+          $or: [...values],
+        },
       };
     }
     let timeOfDayFilters = null;
     if (!!time_of_day) {
-      const values = buildAggregateQueryForArray(time_of_day, 'time_of_day', 'in');
+      const values = buildAggregateQueryForArray(
+        time_of_day,
+        "time_of_day",
+        "in"
+      );
       timeOfDayFilters = {
-        '$match': {
-          '$or': [...values]
-        }
+        $match: {
+          $or: [...values],
+        },
       };
     }
     let idealForFilters = null;
     if (!!ideal_for) {
-      const values = buildAggregateQueryForArray(ideal_for, 'ideal_for', 'in');
+      const values = buildAggregateQueryForArray(ideal_for, "ideal_for", "in");
       idealForFilters = {
-        '$match': {
-          '$or': [...values]
-        }
+        $match: {
+          $or: [...values],
+        },
       };
     }
 
     let fieldsToProject = {};
     for (let key in CauseModel.schema.paths) {
-      if (key !== '_id' && key !== 'sections') {
+      if (key !== "_id" && key !== "sections") {
         fieldsToProject = {
           ...fieldsToProject,
-          [key]: `$${key}`
-        }
+          [key]: `$${key}`,
+        };
       }
     }
 
     const pipeline = [
       {
         $match: {
-          $and: [...causeFilters]
+          $and: [...causeFilters],
         },
       },
       {
         $project: {
           _id: {
-            $toString: "$_id"
+            $toString: "$_id",
           },
-          ...fieldsToProject
-        }
+          ...fieldsToProject,
+        },
       },
       {
         $lookup: {
           from: "locations",
           localField: "_id",
           foreignField: "cause_id",
-          as: "locations"
-        }
-      }
+          as: "locations",
+        },
+      },
     ];
 
     if (!!dayFilters) pipeline.push(dayFilters);
@@ -341,13 +360,13 @@ const aggregateCausesWithLocations = (query) => {
         $match: {
           $or: [
             {
-              "name": { $regex: nameRegex, $options: "i" },
+              name: { $regex: nameRegex, $options: "i" },
             },
             {
-              "organization": { $regex: nameRegex, $options: "i" }
-            }
-          ]
-        }
+              organization: { $regex: nameRegex, $options: "i" },
+            },
+          ],
+        },
       });
     }
 
@@ -356,50 +375,47 @@ const aggregateCausesWithLocations = (query) => {
       let locationQueries = [];
       for (let i = 0; i < parsedLocations.length; i++) {
         const location = parsedLocations[i];
-        const [city, province] = location.split(',');
-        if (city === 'Remote') {
+        const [city, province] = location.split(",");
+        if (city === "Remote") {
           locationQueries.push({
-            $and: [
-              { 'locations.city': { $exists: true, $in: [city] } },
-            ]
+            $and: [{ "locations.city": { $exists: true, $in: [city] } }],
           });
         } else {
           locationQueries.push({
             $and: [
-              { 'locations.city': { $exists: true, $in: [city] } },
-              { 'locations.province': { $exists: true, $in: [province] } }
-            ]
+              { "locations.city": { $exists: true, $in: [city] } },
+              { "locations.province": { $exists: true, $in: [province] } },
+            ],
           });
         }
       }
 
       pipeline.push({
-        "$match": {
-          $or: [...locationQueries]
-        }
+        $match: {
+          $or: [...locationQueries],
+        },
       });
     }
 
     pipeline.push({
       $facet: {
-        ...facet
-      }
+        ...facet,
+      },
     });
 
     CauseModel.aggregate([...pipeline], (err, data) => {
       if (err) {
-        console.log('ERROR:', err);
+        console.log("ERROR:", err);
         return resolve(null);
       }
 
       return resolve({
         docs: data[0].data,
-        metaData: data[0].metadata
+        metaData: data[0].metadata,
       });
     });
-
   });
-}
+};
 
 module.exports = {
   buildQuery,
@@ -409,5 +425,5 @@ module.exports = {
   buildAggregateQueryForArray,
   aggregateCausesWithLocations,
   getToggleState,
-  getEmailRecipient
+  getEmailRecipient,
 };
