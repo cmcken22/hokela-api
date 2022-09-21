@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getUserInfo, validateAdmin } = require("../middlewares/auth");
+const {
+  getUserInfo,
+  validateAdmin,
+  validateAdminAccess,
+} = require("../middlewares/auth");
 const { networkInterfaces } = require("os");
 const path = require("path");
 const fs = require("fs");
@@ -386,6 +390,12 @@ const routes = function() {
     } = req;
     CauseModel.findById(id, async (err, doc) => {
       if (err) {
+        return res
+          .status(500)
+          .send({ err: `Error finding Cause with id: ${id}` });
+      }
+
+      if (doc._doc.status === "ARCHIVED" && !validateAdminAccess(req)) {
         return res
           .status(500)
           .send({ err: `Error finding Cause with id: ${id}` });
