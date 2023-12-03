@@ -10,6 +10,7 @@ then
   export $(cat .config | sed 's/#.*//g' | xargs)
 fi
 
-DECODED=$(echo $GOOGLE_CREDENTIALS | base64 --d)
+DECODED=$(echo $GOOGLE_CREDENTIALS | base64 -d)
+# echo $DECODED
 echo $DECODED > google-credentials.json
 
