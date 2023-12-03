@@ -20,15 +20,16 @@ const sendContactUsEmail = (data = {}) => {
       html: templates.contactUs({ first_name: name, email, message })
     }
   
-    sgMail.send(thankYouMsg).then(() => {
-      console.log('CONTACT US EMAIL SENT:', email);
-      return resolve(true);
-    })
-    .catch(err => {
-      console.log('CONTACT US EMAIL ERR:', email);
-      console.log('err:', err);
-      return resolve(false);
-    });
+    return resolve(true);
+    // sgMail.send(thankYouMsg).then(() => {
+    //   console.log('CONTACT US EMAIL SENT:', email);
+    //   return resolve(true);
+    // })
+    // .catch(err => {
+    //   console.log('CONTACT US EMAIL ERR:', email);
+    //   console.log('err:', err);
+    //   return resolve(false);
+    // });
   })
 }
 
@@ -43,16 +44,17 @@ const sendThankYouForContactingUsEmail = (data = {}) => {
       html: templates.thankYouForContactingUs({ first_name: name, message })
     }
   
-    sgMail.send(thankYouMsg).then((res) => {
-      console.log('THANK YOU EMAIL SENT:', email);
-      console.log('res:', res);
-      return resolve(true);
-    })
-    .catch(err => {
-      console.log('THANK YOU EMAIL ERR:', email);
-      console.log('err:', err);
-      return resolve(false);
-    });
+    return resolve(true);
+    // sgMail.send(thankYouMsg).then((res) => {
+    //   console.log('THANK YOU EMAIL SENT:', email);
+    //   console.log('res:', res);
+    //   return resolve(true);
+    // })
+    // .catch(err => {
+    //   console.log('THANK YOU EMAIL ERR:', email);
+    //   console.log('err:', err);
+    //   return resolve(false);
+    // });
   })
 }
 
@@ -92,16 +94,17 @@ const sendUserApplicationResult = (data = {}) => {
       })
     };
 
-    sgMail.send(thankYouMsg).then((res) => {
-      console.log('THANK YOU EMAIL SENT:', email);
-      console.log('res:', res);
-      return resolve(true);
-    })
-    .catch(err => {
-      console.log('THANK YOU EMAIL ERR:', email);
-      console.log('err:', err);
-      return resolve(false);
-    });
+    return resolve(true);
+    // sgMail.send(thankYouMsg).then((res) => {
+    //   console.log('THANK YOU EMAIL SENT:', email);
+    //   console.log('res:', res);
+    //   return resolve(true);
+    // })
+    // .catch(err => {
+    //   console.log('THANK YOU EMAIL ERR:', email);
+    //   console.log('err:', err);
+    //   return resolve(false);
+    // });
   });
 }
 
@@ -144,16 +147,17 @@ const sendApplicationToOrg = (data = {}) => {
       })
     };
 
-    sgMail.send(thankYouMsg).then((res) => {
-      console.log('THANK YOU EMAIL SENT:', email);
-      console.log('res:', res);
-      return resolve(true);
-    })
-    .catch(err => {
-      console.log('THANK YOU EMAIL ERR:', email);
-      console.log('err:', err);
-      return resolve(false);
-    });
+    return resolve(true);
+    // sgMail.send(thankYouMsg).then((res) => {
+    //   console.log('THANK YOU EMAIL SENT:', email);
+    //   console.log('res:', res);
+    //   return resolve(true);
+    // })
+    // .catch(err => {
+    //   console.log('THANK YOU EMAIL ERR:', email);
+    //   console.log('err:', err);
+    //   return resolve(false);
+    // });
   });
 }
 
@@ -204,16 +208,18 @@ const sendApplicationToHokela = (data = {}) => {
       })
     };
 
-    sgMail.send(thankYouMsg).then((res) => {
-      console.log('THANK YOU EMAIL SENT:', email);
-      console.log('res:', res);
-      return resolve(true);
-    })
-    .catch(err => {
-      console.log('THANK YOU EMAIL ERR:', email);
-      console.log('err:', err);
-      return resolve(false);
-    });
+    return resolve(true);
+
+    // sgMail.send(thankYouMsg).then((res) => {
+    //   console.log('THANK YOU EMAIL SENT:', email);
+    //   console.log('res:', res);
+    //   return resolve(true);
+    // })
+    // .catch(err => {
+    //   console.log('THANK YOU EMAIL ERR:', email);
+    //   console.log('err:', err);
+    //   return resolve(false);
+    // });
   });
 }
 
