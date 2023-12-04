@@ -30,19 +30,20 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-app.get('/healthz', (req, res) => {
-  console.log('/healthz');
-  res.status(200).send({
-    success: 'true',
-    message: 'UP',
-  });
-});
 
 /* For parsing cookies in the request headers. */
 app.use(cookieParser());
 app.use(cors());
+
 // if (process.env.LOCAL) {
 // }
+app.get("/healthz", (req, res) => {
+  console.log("/healthz");
+  res.status(200).send({
+    success: "true",
+    message: "UP",
+  });
+});
 
 /* For parsing the body of http(s) requests. */
 app.use(bodyParser.json({ limit: '15mb' }));
